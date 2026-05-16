@@ -1,0 +1,69 @@
+import * as React from "react";
+
+interface ReadySVGProps extends React.SVGProps<SVGSVGElement> {}
+
+const ReadySVG: React.FC<ReadySVGProps> = (props) => (
+    <>
+  <svg
+    width={40}
+    height={40}
+    viewBox="0 0 40 40"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+    {...props}
+  >
+    <path
+      d="M25 17.367L33 8.91699"
+      stroke="#2C3B4E"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="svg-elem-1"
+    />
+    <path
+      d="M31.666 30H36.666"
+      stroke="#2C3B4E"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="svg-elem-2"
+    />
+    <path
+      d="M15.834 36.6664L35.6907 15.6914C36.0286 15.3537 36.29 14.9473 36.4572 14.4998C36.6243 14.0522 36.6933 13.574 36.6595 13.0974C36.6257 12.6209 36.4898 12.1572 36.2611 11.7378C36.0324 11.3183 35.7162 10.9529 35.334 10.6664L25.984 3.65303C25.7354 3.4714 25.4414 3.36216 25.1346 3.33742C24.8277 3.31268 24.52 3.37341 24.2456 3.51288C23.9712 3.65234 23.7407 3.86509 23.5798 4.12753C23.4189 4.38997 23.3338 4.69185 23.334 4.99969V8.33303C23.334 9.04056 23.1089 9.72975 22.6912 10.3008C22.2735 10.8719 21.6849 11.2953 21.0107 11.5097L14.4623 13.4214C14.133 13.5337 13.8472 13.7464 13.6448 14.0294C13.4425 14.3125 13.3338 14.6518 13.334 14.9997C13.0757 25.6547 9.86398 29.9997 6.66732 29.9997C5.78326 29.9997 4.93542 30.3509 4.31029 30.976C3.68517 31.6011 3.33398 32.449 3.33398 33.333C3.33398 34.2171 3.68517 35.0649 4.31029 35.69C4.93542 36.3152 5.78326 36.6664 6.66732 36.6664H30.0007"
+      stroke="#2C3B4E"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="svg-elem-3"
+    />
+  </svg>
+    <style jsx>
+        {`
+svg .svg-elem-1 {
+  stroke-dashoffset: 13.636265754699707px;
+  stroke-dasharray: 13.636265754699707px;
+  -webkit-transition: stroke-dashoffset 1s cubic-bezier(0.47, 0, 0.745, 0.715) 0s;
+  transition: stroke-dashoffset 1s cubic-bezier(0.47, 0, 0.745, 0.715) 0s;
+}
+svg.active .svg-elem-1 { stroke-dashoffset: 0; }
+
+svg .svg-elem-2 {
+  stroke-dashoffset: 7px;
+  stroke-dasharray: 7px;
+  -webkit-transition: stroke-dashoffset 1s cubic-bezier(0.47, 0, 0.745, 0.715) 0.12s;
+  transition: stroke-dashoffset 1s cubic-bezier(0.47, 0, 0.745, 0.715) 0.12s;
+}
+svg.active .svg-elem-2 { stroke-dashoffset: 0; }
+
+svg .svg-elem-3 {
+  stroke-dashoffset: 119.94548797607422px;
+  stroke-dasharray: 119.94548797607422px;
+  -webkit-transition: stroke-dashoffset 1s cubic-bezier(0.47, 0, 0.745, 0.715) 0.24s;
+  transition: stroke-dashoffset 1s cubic-bezier(0.47, 0, 0.745, 0.715) 0.24s;
+}
+svg.active .svg-elem-3 { stroke-dashoffset: 0; }
+`}
+    </style>
+    </>
+);
+export default ReadySVG;
