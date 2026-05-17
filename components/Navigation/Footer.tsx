@@ -7,7 +7,6 @@ import {
 } from "react-icons/fa6";
 import Image from "next/image";
 import ContainerLayout from "../Layout/ContainerLayout";
-import PlayingWaves from "../Reusable/PlayingWaves";
 
 const legal = [
   { name: "Privacy Policy", href: "/privacy-policy" },
@@ -32,13 +31,9 @@ const Footer = () => {
           {/* ── Col 1: wave (top) + policies (bottom) ── */}
           <div className="flex flex-col md:border-r border-b md:border-b-0 md:border-t border-gray">
 
-            {/* Wave — always visible */}
-            <div className="relative overflow-hidden bg-background border-b border-gray h-[280px] md:h-auto md:flex-1">
-              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                <div className="h-full w-full px-4 [mask-image:radial-gradient(circle,black_50%,transparent_90%)]">
-                  <PlayingWaves barCount={122} />
-                </div>
-              </div>
+            {/* GIF — always visible */}
+            <div className="relative overflow-hidden border-b border-gray h-70 md:h-auto md:flex-1">
+              <Image src="/assets/gif/loop3.gif" alt="Kite" fill className="object-cover" unoptimized />
             </div>
 
             {/* Policies */}
@@ -94,13 +89,9 @@ const Footer = () => {
               </div>
             </div>
 
-            {/* Wave — desktop only */}
-            <div className="hidden md:flex flex-1 relative overflow-hidden bg-background">
-              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                <div className="h-full w-full px-4 [mask-image:radial-gradient(circle,black_50%,transparent_90%)]">
-                  <PlayingWaves barCount={122} />
-                </div>
-              </div>
+            {/* GIF — desktop only */}
+            <div className="hidden md:block flex-1 relative overflow-hidden">
+              <Image src="/assets/gif/loop3.gif" alt="Kite" fill className="object-cover" unoptimized />
             </div>
           </div>
 

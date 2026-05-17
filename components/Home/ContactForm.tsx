@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { FiSmile, FiPhone, FiMail } from "react-icons/fi";
 import ContainerLayout from "../Layout/ContainerLayout";
-import PlayingWaves from "../Reusable/PlayingWaves";
+import Image from "next/image";
 import PrimaryButton from "../Reusable/PrimaryButton";
 import { useToast } from "../Reusable/Toast";
 
@@ -185,13 +185,15 @@ export default function ContactForm() {
           {/* Mobile: reversed → button first, desc, wave last. Desktop: wave, desc, button */}
           <div className="flex flex-col-reverse md:flex-col  border-r border-gray py-20 ">
 
-            {/* Wave visual */}
-            <div className=" hidden  md:block flex-1 relative overflow-hidden bg-[#e3dfd4] min-h-[280px] border-b border-t border-gray">
-              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                <div className="h-full w-full px-4 [mask-image:radial-gradient(circle,black_50%,transparent_90%)]">
-                  <PlayingWaves barCount={122} />
-                </div>
-              </div>
+            {/* GIF visual */}
+            <div className="hidden md:block flex-1 relative overflow-hidden min-h-[280px] border-b border-t border-gray">
+              <Image
+                src="/assets/gif/loop4.gif"
+                alt="Kite animation"
+                fill
+                className="object-cover"
+                unoptimized
+              />
             </div>
 
             {/* Privacy + submit — internally reversed on mobile: button first */}

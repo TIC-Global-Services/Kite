@@ -1,10 +1,11 @@
 "use client";
 
-import { useRef, useMemo, useEffect, Suspense } from "react";
+import { useRef, useMemo, useEffect, useState, Suspense } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { useGLTF, useAnimations, Environment, Stats } from "@react-three/drei";
 import * as THREE from "three";
 import { useControls, folder } from "leva";
+import { motion, AnimatePresence } from "framer-motion";
 
 // ── Place data ────────────────────────────────────────────────────────────
 
@@ -14,8 +15,13 @@ export interface PlaceConfig {
   position: [number, number, number];
   rotation: [number, number, number]; // euler angles in radians
   name: string;
+  subText?: string;
   desc: string;
   targetSize: number; // per-model base size in world units
+  cx: number;   // content overlay X %
+  cy: number;   // content overlay Y %
+  maxW: number; // content overlay max-width px
+  fontSize: number; // title font size rem
 }
 
 export const PLACES: PlaceConfig[] = [
@@ -26,8 +32,9 @@ export const PLACES: PlaceConfig[] = [
     position: [-35, 0, 38],
     rotation: [0, Math.PI, 0],
     targetSize: 90,
-    name: "The Archive",
-    desc: "Where every signal is received and catalogued with perfect recall.",
+    name: "From Input to Intelligence",
+    desc: "Every signal flows into a system purpose-built to interpret context, make intelligent decisions, and take meaningful action in real time—transforming raw inputs into precise, outcome-driven responses.",
+    cx: 5, cy: 60, maxW: 420, fontSize: 2.25,
   },
   {
     id: 2,
@@ -35,8 +42,10 @@ export const PLACES: PlaceConfig[] = [
     position: [78, -2, 39],
     rotation: [0, 0, 0],
     targetSize: 22,
-    name: "The Relay",
-    desc: "Intelligence branches outward, connecting every thread of the network.",
+    name: "Orchestrate Intelligence",
+    subText: "Unify Every Agent. Eliminate Fragmentation.",
+    desc: "Break the barriers between disconnected AI systems. Kite brings agents together into a unified, real-time network that collaborates, thinks collectively, and operates as one intelligent workforce.",
+    cx: 5, cy: 55, maxW: 420, fontSize: 2.25,
   },
   {
     id: 3,
@@ -44,8 +53,9 @@ export const PLACES: PlaceConfig[] = [
     position: [-25, -3, 53],
     rotation: [0, Math.PI, 0],
     targetSize: 28,
-    name: "The Core",
-    desc: "The heart of Kite — where raw context becomes decisive understanding.",
+    name: "Composable Workflow Intelligence",
+    desc: "Break the barriers between disconnected AI systems. Kite brings agents together into a unified, real-time network that collaborates, thinks collectively, and operates as one intelligent workforce.",
+    cx: 55, cy: 60, maxW: 420, fontSize: 2.25,
   },
   {
     id: 4,
@@ -53,8 +63,9 @@ export const PLACES: PlaceConfig[] = [
     position: [-105, -4, 85],
     rotation: [0, Math.PI, 0],
     targetSize: 22,
-    name: "The Bridge",
-    desc: "Decisions cross into action through a network of coordinated agents.",
+    name: "Unified Tooling Layer",
+    desc: "A powerful abstraction layer that seamlessly exposes browsers, databases, APIs, cloud platforms, and file systems to your workers. It standardizes access to external tools, enabling smooth integration, secure interactions, and consistent execution across diverse environments.",
+    cx: 5, cy: 50, maxW: 420, fontSize: 2.25,
   },
   // Direction turns here — row 2 comes back left (places 5–7)
   {
@@ -63,8 +74,9 @@ export const PLACES: PlaceConfig[] = [
     position: [50, 0, -30],
     rotation: [0, 0, 0],
     targetSize: 26,
-    name: "The Horizon",
-    desc: "Where Kite's reach extends — output meets the real world.",
+    name: "Autonomous Execution Workers",
+    desc: "Run tasks through isolated execution services designed for reliability and precision—handling both deterministic operations and LLM-driven actions. Each worker operates independently, ensuring scalable performance, fault tolerance, and consistent outcomes across every workflow.",
+    cx: 55, cy: 55, maxW: 420, fontSize: 2.25,
   },
   {
     id: 6,
@@ -72,8 +84,9 @@ export const PLACES: PlaceConfig[] = [
     position: [-58, 0, 85],
     rotation: [0, Math.PI, 0],
     targetSize: 22,
-    name: "The Forge",
-    desc: "Raw intelligence is shaped into precise, deployable action.",
+    name: "Persistent Intelligence Layer",
+    desc: "Maintain continuity with a robust memory system that stores embeddings, logs, task states, and structured knowledge over time. It enables your system to learn, adapt, and make more informed decisions—turning every interaction into lasting intelligence.",
+    cx: 5, cy: 65, maxW: 420, fontSize: 2.25,
   },
   {
     id: 7,
@@ -81,8 +94,9 @@ export const PLACES: PlaceConfig[] = [
     position: [-40, 0, 50],
     rotation: [0, -Math.PI, 0],
     targetSize: 28,
-    name: "The Nexus",
-    desc: "All systems converge — the living center of the Kite network.",
+    name: "Built-in Governance & Safety",
+    desc: "A dedicated policy engine that enforces permissions, compliance rules, rate limits, and safety controls at every step. It ensures secure, reliable operations while maintaining strict governance—so every action stays aligned with defined boundaries and standards.",
+    cx: 55, cy: 50, maxW: 420, fontSize: 2.25,
   },
   {
     id: 8,
@@ -90,8 +104,9 @@ export const PLACES: PlaceConfig[] = [
     position: [40, -5, -65],
     rotation: [0, 0, 0],
     targetSize: 28,
-    name: "The Vault",
+    name: "Introducing Kite AI",
     desc: "Secured intelligence — where critical knowledge is preserved and protected.",
+    cx: 5, cy: 60, maxW: 420, fontSize: 2.25,
   },
 ];
 
@@ -537,27 +552,83 @@ PLACES.forEach(({ url }) => useGLTF.preload(url));
 
 export default function TownScene({
   progressRef,
+  activePlaceIndex = -1,
 }: {
   progressRef: React.RefObject<number>;
+  activePlaceIndex?: number;
 }) {
   const debugRef = useRef<HTMLDivElement | null>(null);
+
+  // Keep showing last visible place until a new one arrives
+  const lastPlaceRef = useRef<number>(-1);
+  const [displayedIndex, setDisplayedIndex] = useState<number>(-1);
+  useEffect(() => {
+    if (activePlaceIndex >= 0) {
+      lastPlaceRef.current = activePlaceIndex;
+      setDisplayedIndex(activePlaceIndex);
+    }
+  }, [activePlaceIndex]);
+
+  // Per-place content style controls
+  const cp = useControls("Content Positions", {
+    ...Object.fromEntries(
+      PLACES.flatMap((p) => [
+        [`p${p.id}x`,  { value: p.cx,       min: 0,   max: 95,   step: 1,    label: `P${p.id} X %`       }],
+        [`p${p.id}y`,  { value: p.cy,       min: 0,   max: 95,   step: 1,    label: `P${p.id} Y %`       }],
+        [`p${p.id}w`,  { value: p.maxW,     min: 100, max: 1200, step: 10,   label: `P${p.id} MaxW px`   }],
+        [`p${p.id}fs`, { value: p.fontSize, min: 0.5, max: 6,    step: 0.05, label: `P${p.id} Title rem` }],
+      ])
+    ),
+  }) as Record<string, number>;
+
+  const place = displayedIndex >= 0 ? PLACES[displayedIndex] : null;
+  const cx = place ? cp[`p${place.id}x`]  : 5;
+  const cy = place ? cp[`p${place.id}y`]  : 60;
+  const cw = place ? cp[`p${place.id}w`]  : 420;
+  const fs = place ? cp[`p${place.id}fs`] : 2.25;
 
   return (
     <div className="w-full h-full relative">
       <Canvas
         className="w-full h-full"
         camera={{ position: [-56, 7, 47], fov: 55, near: 0.1, far: 600 }}
-        gl={{
-          alpha: true,
-          antialias: true,
-          powerPreference: "high-performance",
-        }}
+        gl={{ alpha: true, antialias: true, powerPreference: "high-performance" }}
       >
         <CameraRig progressRef={progressRef} debugRef={debugRef} />
         <Suspense fallback={null}>
           <SceneContent />
         </Suspense>
       </Canvas>
+
+      {/* ── Content overlay ── */}
+      <AnimatePresence>
+        {place && (
+          <motion.div
+            key={place.id}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.35, ease: [0.25, 0.1, 0, 1] }}
+            className="absolute pointer-events-none select-none"
+            style={{
+              left: `${cx}%`,
+              top: `${cy}%`,
+              maxWidth: cw,
+            }}
+          >
+            <h2 className="text-[#1C2632] font-light leading-snug mb-2 drop-shadow-lg" style={{ fontSize: `${fs}rem` }}>
+              {place.name}
+            </h2>
+            {place.subText && (
+              <p className="font-ki text-[#ff6b00] text-sm mb-2">{place.subText}</p>
+            )}
+            <p className="font-ki text-foreground text-lg leading-relaxed drop-shadow">
+              {place.desc}
+            </p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <div
         ref={debugRef}
         className="absolute bottom-4 left-4 font-mono text-xs text-white bg-black/60 px-2 py-1 rounded pointer-events-none"

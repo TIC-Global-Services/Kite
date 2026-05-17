@@ -1,15 +1,14 @@
 "use client";
 
-import { useRef, useState, useEffect } from "react";
+import { useRef } from "react";
+import Image from "next/image";
 import { motion, useInView } from "framer-motion";
 import ContainerLayout from "../Layout/ContainerLayout";
 import MultimodalIcon from "../Reusable/Icons/Multimodal";
 import CloudIcon from "../Reusable/Icons/Cloud";
 import FineTuningIcon from "../Reusable/Icons/FineTuning";
 import ReadyIcon from "../Reusable/Icons/Ready";
-import PlayingWaves from "../Reusable/PlayingWaves";
 import DotIcon from "../Reusable/Icons/DotIcon";
-import { useAudioAnalyser } from "@/lib/useAudioAnalyser";
 
 // ── Data ───────────────────────────────────────────────────────────────────
 
@@ -77,7 +76,6 @@ function FeatureRow({
 // ── WhyKite ────────────────────────────────────────────────────────────────
 
 export default function WhyKite() {
-  const { analyser } = useAudioAnalyser();
   const leftRef = useRef(null);
   const leftInView = useInView(leftRef, { once: true, margin: "-80px" });
 
@@ -89,21 +87,19 @@ export default function WhyKite() {
           {/* ── Left col ── */}
           <div className="flex flex-col border-b  md:border-r border-y border-gray">
 
-            {/* PlayingWaves — interactive, reacts to mic if active */}
+            {/* GIF */}
             <motion.div
-              className="flex-1 relative overflow-hidden bg-[#e3dfd4] border-b border-gray min-h-[300px]  cursor-pointer"
-              whileHover={{ backgroundColor: "#d8d4c9" }}
-              transition={{ duration: 0.3 }}
+              className="flex-1 relative overflow-hidden border-b border-gray min-h-75"
+              whileHover={{ scale: 1.02 }}
+              transition={{ type: "spring", stiffness: 180, damping: 20 }}
             >
-              <motion.div
-                className="absolute inset-0 flex items-center justify-center pointer-events-none"
-                whileHover={{ scale: 1.06 }}
-                transition={{ type: "spring", stiffness: 180, damping: 20 }}
-              >
-                <div className="h-full w-full px-4 [mask-image:radial-gradient(circle,black_50%,transparent_90%)]">
-                  <PlayingWaves barCount={122} analyser={analyser} />
-                </div>
-              </motion.div>
+              <Image
+                src="/assets/gif/loop1.gif"
+                alt="Kite animation"
+                fill
+                className="object-cover"
+                unoptimized
+              />
             </motion.div>
 
             {/* Text panel */}

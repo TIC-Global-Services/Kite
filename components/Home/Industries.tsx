@@ -19,10 +19,10 @@ const PH = "/assets/industry_placeholder.png";
 
 const TAB_CARDS = [
   [
-    { title: "Content Research\n& Creation", image: PH },
-    { title: "Archive\nRepurposing", image: PH },
-    { title: "Game Highlights\n& Reels", image: PH },
-    { title: "Performance\nAnalysis & Intel", image: PH },
+    { title: "Content Research\n& Creation", image: '/icons/industries/research.svg' },
+    { title: "Archive\nRepurposing", image: '/icons/industries/archive.svg' },
+    { title: "Game Highlights\n& Reels", image: '/icons/industries/highlight.svg' },
+    { title: "Performance\nAnalysis & Intel", image: '/icons/industries/analysis.svg' },
   ],
   [
     { title: "Campaign\nIntelligence", image: PH },
@@ -88,7 +88,7 @@ function Card({
           transition: { type: "spring", stiffness: 260, damping: 16 },
         }}
       >
-        <Image src={image} alt={title} fill className="object-cover" />
+        <Image src={image} alt={title} fill className="object-contain p-10" />
       </motion.div>
       <p className="text-[#ff6b00] text-xl leading-snug whitespace-pre-line">
         {title}

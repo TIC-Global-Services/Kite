@@ -37,7 +37,7 @@ const TownScene = dynamic(() => import("./TownScene"), {
 
 function getActivePlace(p: number): number {
   if (p < 0.20) return -1;   // expansion phase (no label)
-  if (p < 0.25) return 0;    // Place 1  (PLACES[0])
+  if (p < 0.25) return 0;    // Place 1
   if (p < 0.35) return 1;    // Place 2
   if (p < 0.45) return 2;    // Place 3
   if (p < 0.55) return 3;    // Place 4
@@ -230,7 +230,7 @@ const Hero = () => {
       >
         {/* Border sits inside the clip so it animates with the canvas */}
         <div className="absolute inset-0 border border-gray pointer-events-none z-10" />
-        <TownScene progressRef={progressRef} />
+        <TownScene progressRef={progressRef} activePlaceIndex={activePlace} />
       </div>
     </div>
     </>
