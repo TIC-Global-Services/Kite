@@ -39,7 +39,7 @@ const ContainerLayout: React.FC<ContainerProps> = ({
   className,
   disablePaddingX = false,
   disablePaddingY = false,
-  paddingX = "px-6 md:px-10",
+  paddingX = "px-4 md:px-10",
   paddingY = " py-8 md:py-10",
 }) => {
   return (

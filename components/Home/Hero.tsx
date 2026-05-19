@@ -54,9 +54,11 @@ const Hero = () => {
   const { mode, analyser, startListening, stop } = useAudioAnalyser();
   const isListening = mode !== "idle";
 
-  const containerRef   = useRef<HTMLDivElement>(null);
-  const leftPanelRef   = useRef<HTMLDivElement>(null);
-  const canvasWrapperRef = useRef<HTMLDivElement>(null);
+  const containerRef       = useRef<HTMLDivElement>(null);
+  const mobileContainerRef = useRef<HTMLDivElement>(null);
+  const mobileContentRef   = useRef<HTMLDivElement>(null);
+  const leftPanelRef       = useRef<HTMLDivElement>(null);
+  const canvasWrapperRef   = useRef<HTMLDivElement>(null);
 
   // Written by GSAP ScrollTrigger onUpdate, read by R3F useFrame — no React state
   const progressRef   = useRef<number>(0);
@@ -64,6 +66,14 @@ const Hero = () => {
 
   const [activePlace, setActivePlace] = useState<number>(-1);
   const [dotsVisible, setDotsVisible] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
 
   // Full-page loader — tracks GLB model loading via Three.js DefaultLoadingManager
   const { progress, active } = useProgress();
@@ -78,50 +88,57 @@ const Hero = () => {
 
   useGSAP(
     () => {
+      const triggerEl = isMobile ? mobileContainerRef.current : containerRef.current;
+      if (!triggerEl) return;
+
       const tl = gsap.timeline({
         scrollTrigger: {
-          trigger: containerRef.current,
-          // "top 9dvh" fires at scroll=0 because the hero's top is already
-          // at 9dvh (below the fixed nav). The hero is pinned in place for
-          // the entire 500vh of scroll room that follows.
+          trigger: triggerEl,
           start: "top 9%",
           end: "+=500%",
-
           pin: true,
           pinSpacing: true,
-          scrub: 1,
+          scrub: 0.5,
           onUpdate: (st) => {
-            // Camera progress starts after expansion (first 20% of scroll)
-            progressRef.current = Math.max(0, (st.progress - 0.2) / 0.8);
-
+            // Clamp at 0.92 (raw ≈ 7.36 in 8-waypoint space, t > 0.3 in last
+            // segment so content 8 shows) — prevents camera flying to the
+            // dramatic WP8 drone-overview position at the very end of scroll.
+            progressRef.current = Math.min(0.92, Math.max(0, (st.progress - 0.2) / 0.8));
             const next = getActivePlace(st.progress);
             if (next !== activePlaceRef.current) {
               activePlaceRef.current = next;
               setActivePlace(next);
-              // Show dots once the canvas has expanded past the mid-point
               setDotsVisible(st.progress > 0.22);
             }
           },
         },
       });
 
-      // Phase 1 (0–20 %): expand canvas clip-path + fade left panel
-      tl.fromTo(
-        canvasWrapperRef.current,
-        { clipPath: "inset(0% 0% 0% 50%)" },
-        { clipPath: "inset(0% 0% 0% 0%)", ease: "power2.inOut", duration: 0.2 }
-      );
-      tl.fromTo(
-        leftPanelRef.current,
-        { autoAlpha: 1, x: 0 },
-        { autoAlpha: 0, x: -36, ease: "power2.in", duration: 0.18 },
-        "<" // concurrent
-      );
+      if (isMobile) {
+        // Mobile: slide content panel up + fade, 3-D was already visible below it
+        tl.fromTo(
+          mobileContentRef.current,
+          { autoAlpha: 1, y: 0 },
+          { autoAlpha: 0, y: -60, ease: "power2.in", duration: 0.2 }
+        );
+      } else {
+        // Desktop: expand canvas clip-path + fade left panel
+        tl.fromTo(
+          canvasWrapperRef.current,
+          { clipPath: "inset(0% 0% 0% 50%)" },
+          { clipPath: "inset(0% 0% 0% 0%)", ease: "power2.inOut", duration: 0.2 }
+        );
+        tl.fromTo(
+          leftPanelRef.current,
+          { autoAlpha: 1, x: 0 },
+          { autoAlpha: 0, x: -36, ease: "power2.in", duration: 0.18 },
+          "<"
+        );
+      }
 
-      // Phase 2–5 (20–100 %): camera handled by progressRef in R3F useFrame
       tl.to({}, { duration: 0.8 });
     },
-    { scope: containerRef, dependencies: [] }
+    { dependencies: [isMobile] }
   );
 
   // ── Render ──────────────────────────────────────────────────────────────
@@ -139,7 +156,6 @@ const Hero = () => {
         >
           <div className="flex flex-col items-center gap-10">
             <h1 className="text-5xl font-ki tracking-tight text-primary">Kite</h1>
-            {/* Progress bar */}
             <div className="w-56 h-[1px] bg-gray relative overflow-hidden">
               <motion.div
                 className="absolute inset-y-0 left-0 bg-primary"
@@ -155,23 +171,74 @@ const Hero = () => {
       )}
     </AnimatePresence>
 
+    {/* ── Mobile layout ── */}
+    <div ref={mobileContainerRef} className="md:hidden mt-[9dvh] h-[91dvh] relative overflow-hidden">
+
+      {/* Canvas — full-screen, no z-index so overlay's z-30 wins in document context */}
+      <div className="absolute inset-0">
+        <TownScene progressRef={progressRef} activePlaceIndex={activePlace} isMobile />
+      </div>
+
+      {/* Content panel — pinned to top, auto height, 3-D visible below */}
+      <div ref={mobileContentRef} className="absolute top-0 left-0 right-0 flex flex-col">
+        {/* Waves */}
+        <div className="relative bg-[#E3DFD4] overflow-hidden border-b border-gray" style={{ height: "20dvh" }}>
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <div className="h-full w-full px-4 [mask-image:radial-gradient(circle,black_50%,transparent_90%)]">
+              <PlayingWaves barCount={60} analyser={analyser} />
+            </div>
+          </div>
+        </div>
+
+        {/* Title + description */}
+        <div className="px-6 py-4 space-y-2 border-b border-gray bg-background">
+          <h1 className="text-[clamp(1.5rem,6vw,2.25rem)] leading-[1.1]">
+            Make AI see, think,
+            <br />
+            reason, and execute
+          </h1>
+          <p className="font-ki text-sm text-foreground/75 leading-relaxed">
+            Explore live AI experiences that gather signals from the
+            web, organize what matters, and execute tasks autonomously
+          </p>
+        </div>
+
+        {/* Buttons */}
+        <div className="flex items-center gap-4 px-6 py-4 border-t border-gray shrink-0 bg-background">
+          <PrimaryButton
+            onClick={handleTalkClick}
+            showIcon={true}
+            isPlaying={isListening}
+            className="text-xs py-2.5"
+          >
+            {isListening ? "Listening…" : "Talk to Kite"}
+          </PrimaryButton>
+          <div className="w-0.5 h-5 bg-primary" />
+          <div className="flex items-center gap-2 cursor-pointer group">
+            <p className="transition-all duration-300 tracking-tighter group-hover:tracking-0 font-semibold font-ki text-sm">
+              Swap your Voice
+            </p>
+            <DotIcon />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {/* ── Desktop layout ── */}
     <div
       ref={containerRef}
-      className="mt-[9dvh] h-[91dvh] relative overflow-hidden"
+      className="hidden md:block mt-[9dvh] h-[91dvh] relative overflow-hidden"
     >
-
       {/* ── Left panel (waves + text + buttons) ── */}
       <div
         ref={leftPanelRef}
         className="absolute inset-0 z-20"
       >
-        {/* ContainerLayout provides border-x + horizontal padding */}
         <ContainerLayout
           disablePaddingY
           className="border-x border-b border-gray h-full"
         >
         <div className="grid grid-cols-2 h-full">
-          {/* Left column — fully interactive until it fades */}
           <div className="flex flex-col h-full">
             <div className="flex-1 relative border border-gray overflow-hidden bg-[#E3DFD4]">
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
@@ -212,23 +279,18 @@ const Hero = () => {
             </div>
           </div>
 
-          {/* Right column — canvas (z-10) shows through here */}
+          {/* Right column — canvas shows through here */}
           <div className="border-l border-gray" />
         </div>
         </ContainerLayout>
       </div>
 
       {/* ── 3-D Canvas ── */}
-      {/*
-        Starts clipped to the right 50% (matching the hero's right column).
-        GSAP animates clip-path to 0% as user scrolls.
-      */}
       <div
         ref={canvasWrapperRef}
         className="absolute inset-0 z-10"
         style={{ clipPath: "inset(0% 0% 0% 50%)" }}
       >
-        {/* Border sits inside the clip so it animates with the canvas */}
         <div className="absolute inset-0 border border-gray pointer-events-none z-10" />
         <TownScene progressRef={progressRef} activePlaceIndex={activePlace} />
       </div>

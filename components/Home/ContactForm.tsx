@@ -131,7 +131,7 @@ export default function ContactForm() {
         <div className="grid grid-cols-1 md:grid-cols-2">
 
           {/* ── Left: header + form ── */}
-          <div className="flex flex-col border-b md:border-b-0 md:border-x border-gray py-20">
+          <div className="flex flex-col border-b md:border-b-0 border-x border-gray py-20">
 
             {/* Dark header */}
             <div className="bg-primary text-background p-10 space-y-3 border-b border-gray">
@@ -183,7 +183,7 @@ export default function ContactForm() {
 
           {/* ── Right: wave + privacy + button ── */}
           {/* Mobile: reversed → button first, desc, wave last. Desktop: wave, desc, button */}
-          <div className="flex flex-col-reverse md:flex-col  border-r border-gray py-20 ">
+          <div className="flex flex-col-reverse md:flex-col border-x  border-r border-gray py-20 ">
 
             {/* GIF visual */}
             <div className="hidden md:block flex-1 relative overflow-hidden min-h-[280px] border-b border-t border-gray">

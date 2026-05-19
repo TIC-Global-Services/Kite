@@ -57,7 +57,7 @@ function FeatureRow({
       initial={{ opacity: 0, x: 32 }}
       animate={inView ? { opacity: 1, x: 0 } : {}}
       transition={{ delay: index * 0.1, duration: 0.4, ease: [0.25, 0.1, 0, 1] }}
-      className="flex items-center gap-6 p-8 border-b border-gray last:border-b-0 group"
+      className="flex items-center gap-4 md:gap-6 p-5 md:p-8 border-b border-gray last:border-b-0 group"
     >
       {/* Icon — draw animation on inView, rotate on group-hover */}
       <div className="shrink-0 transition-transform duration-300 ease-out group-hover:rotate-[-8deg] group-hover:scale-110">
@@ -66,8 +66,8 @@ function FeatureRow({
 
       {/* Text */}
       <div className="space-y-1 max-w-md">
-        <h3 className="text-[#ff6b00] text-2xl">{title}</h3>
-        <p className="font-ki text-lg text-foreground/80 leading-relaxed">{desc}</p>
+        <h3 className="text-[#ff6b00] text-xl md:text-2xl">{title}</h3>
+        <p className="font-ki text-sm md:text-lg text-foreground/80 leading-relaxed">{desc}</p>
       </div>
     </motion.div>
   );
@@ -82,14 +82,14 @@ export default function WhyKite() {
   return (
     <section className="w-full">
       <ContainerLayout disablePaddingY >
-        <div className="grid grid-cols-1 md:grid-cols-2 border-x border-b py-20 border-gray">
+        <div className="grid grid-cols-1 md:grid-cols-2 border-x border-b py-10 md:py-20 border-gray">
 
           {/* ── Left col ── */}
           <div className="flex flex-col border-b  md:border-r border-y border-gray">
 
             {/* GIF */}
             <motion.div
-              className="flex-1 relative overflow-hidden border-b border-gray min-h-75"
+              className="flex-1 relative overflow-hidden border-b border-gray min-h-[200px] md:min-h-[300px]"
               whileHover={{ scale: 1.02 }}
               transition={{ type: "spring", stiffness: 180, damping: 20 }}
             >
@@ -108,7 +108,7 @@ export default function WhyKite() {
               initial={{ opacity: 0, y: 24 }}
               animate={leftInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.5, ease: [0.25, 0.1, 0, 1] }}
-              className="p-10 space-y-5"
+              className=" p-6 md:p-10 space-y-5"
             >
               {/* Label */}
               <div className="flex items-center gap-2">
@@ -118,11 +118,11 @@ export default function WhyKite() {
                 </span>
               </div>
 
-              <h2 className="text-5xl leading-[1.05]">
+              <h2 className="text-3xl md:text-5xl leading-[1.05]">
                 Built For<br />The Physical World
               </h2>
 
-              <p className="font-ki text-lg text-foreground/80 leading-relaxed max-w-xl">
+              <p className="font-ki text-sm md:text-lg text-foreground/80 leading-relaxed max-w-xl">
                 From complex operations to everyday workflows, Kite seamlessly
                 adapts to your domain — flexible enough to handle depth, yet
                 simple enough for daily use.

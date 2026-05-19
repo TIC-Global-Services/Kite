@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useCallback } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import ContainerLayout from "../Layout/ContainerLayout";
@@ -79,7 +79,7 @@ function Card({
         scale: 1.025,
         transition: { type: "spring", stiffness: 320, damping: 22 },
       }}
-      className="bg-[#d5d1c8] flex flex-col min-h-[60dvh] border border-gray p-6 cursor-default"
+      className="bg-[#d5d1c8] flex flex-col min-h-[40dvh] md:min-h-[60dvh] border border-gray p-6 cursor-default"
     >
       <motion.div
         className="flex-1 relative overflow-hidden"
@@ -103,6 +103,14 @@ export default function Industries() {
   const [activeTab, setActiveTab] = useState(0);
   const direction = useRef(1);
   const prevTab = useRef(0);
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  const scrollCards = useCallback((dir: 1 | -1) => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const cardWidth = el.firstElementChild ? (el.firstElementChild as HTMLElement).offsetWidth + 16 : el.offsetWidth;
+    el.scrollBy({ left: dir * cardWidth, behavior: "smooth" });
+  }, []);
 
   const handleTab = (i: number) => {
     direction.current = i > prevTab.current ? 1 : -1;
@@ -116,14 +124,14 @@ export default function Industries() {
         <div className=" border-x border-gray border-b">
           {/* ── Header ── */}
           <div className=" border-b  pt-20 border-gray">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 p-10 border-t border-gray">
-              <h2 className="text-5xl md:text-6xl leading-[1.05]">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 p-6 md:p-10 border-t border-gray">
+              <h2 className="text-4xl md:text-6xl leading-[1.05]">
                 Customized
                 <br />
                 Intelligence, Enterprise-Ready
               </h2>
               <div className="flex md:items-end md:justify-end">
-                <p className="font-ki text-foreground text-base leading-relaxed max-w-lg">
+                <p className="font-ki text-foreground text-sm md:text-base leading-relaxed max-w-lg">
                   While most AI understands text, Kite understands reality
                   combining visual, auditory, and contextual signals to operate
                   beyond the screen.
@@ -133,7 +141,7 @@ export default function Industries() {
           </div>
 
           {/* ── Tabs ── */}
-          <div className="flex items-center gap-2 px-10 py-4 border-b border-gray overflow-x-auto">
+          <div className="flex items-center gap-2 px-6 md:px-10 py-4 border-b border-gray overflow-x-auto">
             {TABS.map((tab, i) => (
               <button
                 key={tab.id}
@@ -158,7 +166,7 @@ export default function Industries() {
           </div>
 
           {/* ── Cards — slide direction-aware on tab switch ── */}
-          <div className="p-10 overflow-hidden">
+          <div className="py-6 px-6 md:p-10 md:overflow-hidden">
             <AnimatePresence mode="wait" custom={direction.current}>
               <motion.div
                 key={activeTab}
@@ -174,18 +182,38 @@ export default function Industries() {
                   x: direction.current * -50,
                   transition: { duration: 0.18, ease: "easeIn" },
                 }}
-                className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4"
+                className="flex overflow-x-auto snap-x snap-mandatory md:grid md:grid-cols-4 md:overflow-visible md:snap-none gap-4 pb-2 md:pb-0"
+                ref={scrollRef as any}
               >
                 {TAB_CARDS[activeTab].map((card, i) => (
-                  <Card
-                    key={i}
-                    title={card.title}
-                    image={card.image}
-                    index={i}
-                  />
+                  <div key={i} className="snap-center shrink-0 w-[78vw] md:w-auto md:shrink-[unset]">
+                    <Card
+                      title={card.title}
+                      image={card.image}
+                      index={i}
+                    />
+                  </div>
                 ))}
               </motion.div>
             </AnimatePresence>
+
+            {/* Arrow buttons — mobile only */}
+            <div className="flex items-center gap-3 mt-4 md:hidden">
+              <button
+                onClick={() => scrollCards(-1)}
+                className="flex items-center justify-center w-10 h-10 border border-gray hover:border-primary transition-colors"
+                aria-label="Previous card"
+              >
+                <Image src="/icons/prev-btn.svg" alt="Previous" width={20} height={20} />
+              </button>
+              <button
+                onClick={() => scrollCards(1)}
+                className="flex items-center justify-center w-10 h-10 border border-gray hover:border-primary transition-colors"
+                aria-label="Next card"
+              >
+                <Image src="/icons/next-btn.svg" alt="Next" width={20} height={20} />
+              </button>
+            </div>
           </div>
         </div>
       </ContainerLayout>

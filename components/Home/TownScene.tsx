@@ -141,10 +141,11 @@ const WAYPOINTS = [
 
 const WAYPOINT_NAMES = ["Start","Archive","Relay","Core","Bridge","Horizon","Forge","Nexus","Vault"];
 
-function CameraRig({ progressRef, debugRef }: { progressRef: React.RefObject<number>; debugRef: React.RefObject<HTMLDivElement | null> }) {
+function CameraRig({ progressRef, debugRef, isMobile }: { progressRef: React.RefObject<number>; debugRef: React.RefObject<HTMLDivElement | null>; isMobile: boolean }) {
   const { camera } = useThree();
   const _pos    = useRef(new THREE.Vector3());
   const _target = useRef(new THREE.Vector3());
+  const _dir    = useRef(new THREE.Vector3());
 
   const wp = useControls("Camera Waypoints", {
     "0 — Start":   folder({ w0px:{value:WAYPOINTS[0].pos[0],step:1,label:"Pos X"},   w0py:{value:WAYPOINTS[0].pos[1],step:1,label:"Pos Y"},   w0pz:{value:WAYPOINTS[0].pos[2],step:1,label:"Pos Z"},   w0tx:{value:WAYPOINTS[0].target[0],step:1,label:"Tgt X"},  w0ty:{value:WAYPOINTS[0].target[1],step:1,label:"Tgt Y"},  w0tz:{value:WAYPOINTS[0].target[2],step:1,label:"Tgt Z"}  }, {collapsed:true}),
@@ -174,6 +175,17 @@ function CameraRig({ progressRef, debugRef }: { progressRef: React.RefObject<num
     _pos.current.set(ax + (bx-ax)*t, ay + (by-ay)*t, az + (bz-az)*t);
     _target.current.set(atx + (btx-atx)*t, aty + (bty-aty)*t, atz + (btz-atz)*t);
 
+    if (isMobile) {
+      // Push camera further back so models appear smaller / more distant
+      _dir.current.subVectors(_pos.current, _target.current).normalize();
+      _pos.current.addScaledVector(_dir.current, 6);
+
+      // At progress=0 tilt camera upward (raise target Y) so the town sits at
+      // the bottom of the canvas frame. Fade the offset to 0 by progress=0.15.
+      const tiltFade = 1 - THREE.MathUtils.clamp(p / 0.15, 0, 1);
+      _target.current.y += 14 * tiltFade;
+    }
+
     camera.position.copy(_pos.current);
     camera.lookAt(_target.current);
 
@@ -182,6 +194,19 @@ function CameraRig({ progressRef, debugRef }: { progressRef: React.RefObject<num
     }
   });
 
+  return null;
+}
+
+// ── Mobile FOV override ────────────────────────────────────────────────────
+
+function MobileFOV({ isMobile }: { isMobile: boolean }) {
+  const { camera } = useThree();
+  useEffect(() => {
+    if (!isMobile) return;
+    const cam = camera as THREE.PerspectiveCamera;
+    cam.fov = 90;
+    cam.updateProjectionMatrix();
+  }, [isMobile, camera]);
   return null;
 }
 
@@ -580,9 +605,11 @@ PLACES.forEach(({ url }) => useGLTF.preload(url));
 export default function TownScene({
   progressRef,
   activePlaceIndex = -1,
+  isMobile = false,
 }: {
   progressRef: React.RefObject<number>;
   activePlaceIndex?: number;
+  isMobile?: boolean;
 }) {
   const debugRef = useRef<HTMLDivElement | null>(null);
 
@@ -618,7 +645,8 @@ export default function TownScene({
         camera={{ position: [-56, 7, 47], fov: 55, near: 0.1, far: 600 }}
         gl={{ alpha: true, antialias: true, powerPreference: "high-performance" }}
       >
-        <CameraRig progressRef={progressRef} debugRef={debugRef} />
+        <MobileFOV isMobile={isMobile} />
+        <CameraRig progressRef={progressRef} debugRef={debugRef} isMobile={isMobile} />
         <WaypointSync progressRef={progressRef} onSegmentChange={handleSegmentChange} />
         <Suspense fallback={null}>
           <SceneContent />
@@ -634,14 +662,22 @@ export default function TownScene({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.35, ease: [0.25, 0.1, 0, 1] }}
-            className="absolute pointer-events-none select-none"
-            style={{
+            className="absolute z-30 pointer-events-none select-none"
+            style={isMobile ? {
+              left: "4%",
+              right: "4%",
+              top: "4%",
+              maxWidth: "100%",
+            } : {
               left: `${cx}%`,
               top: `${cy}%`,
               maxWidth: cw,
             }}
           >
-            <h2 className="text-[#1C2632] font-light leading-[1.1] mb-1.5 drop-shadow-lg" style={{ fontSize: `${fs}rem` }}>
+            <h2
+              className="text-[#1C2632] font-light leading-[1.1] mb-1.5 drop-shadow-lg"
+              style={{ fontSize: isMobile ? `${Math.min(fs, 1.25)}rem` : `${fs}rem` }}
+            >
               {place.nameHighlight
                 ? place.name.split(place.nameHighlight).flatMap((part, i, arr) =>
                     i < arr.length - 1
@@ -651,9 +687,14 @@ export default function TownScene({
                 : place.name}
             </h2>
             {place.subText && (
-              <p className="font-ki text-[#ff6b00] text-sm mb-1.5">{place.subText}</p>
+              <p className="font-ki text-[#ff6b00] mb-1" style={{ fontSize: isMobile ? "0.7rem" : undefined }}>
+                {place.subText}
+              </p>
             )}
-            <p className="font-ki text-foreground leading-[1.4] drop-shadow" style={{ fontSize: `${dfs}rem` }}>
+            <p
+              className="font-ki text-foreground leading-[1.4] drop-shadow"
+              style={{ fontSize: isMobile ? "0.75rem" : `${dfs}rem` }}
+            >
               {place.desc}
             </p>
           </motion.div>

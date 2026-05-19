@@ -74,13 +74,13 @@ function CapabilityCard({
         duration: 0.55,
         ease: [0.25, 0.1, 0, 1],
       }}
-      className="relative flex flex-col min-h-[380px] justify-between p-8 border-b border-gray md:border-b-0 md:border-r last:border-0 group cursor-default"
+      className="relative flex flex-col min-h-[280px] md:min-h-[380px] justify-between p-6 md:p-8 border-b border-gray md:border-b-0 md:border-r last:border-0 group cursor-default"
       whileHover={{ backgroundColor: "rgba(255,255,255,0.025)" }}
     >
       {/* Title row */}
       <div className="flex items-center gap-3">
         <motion.h3
-          className="text-[#ff6b00] text-3xl font-light"
+          className="text-[#ff6b00] text-2xl md:text-3xl font-light"
           initial={{ opacity: 0, x: -12 }}
           animate={inView ? { opacity: 1, x: 0 } : {}}
           transition={{ delay: index * 0.15 + 0.1, duration: 0.4 }}
@@ -98,7 +98,7 @@ function CapabilityCard({
 
       {/* Description */}
       <motion.p
-        className="font-ki text-lg text-background leading-relaxed mt-6"
+        className="font-ki text-sm md:text-lg text-background leading-relaxed mt-4 md:mt-6"
         initial={{ opacity: 0 }}
         animate={inView ? { opacity: 1 } : {}}
         transition={{ delay: index * 0.15 + 0.35, duration: 0.45 }}
@@ -118,19 +118,19 @@ export default function FoundationalIntelligence() {
   return (
     <section className="w-full bg-primary">
       <ContainerLayout disablePaddingY>
-        <div className="border-x border-b border-gray py-20">
+        <div className="border-x border-b border-gray py-10 md:py-20">
           {/* Header */}
           <motion.div
             ref={headerRef}
             initial={{ opacity: 0, y: 32 }}
             animate={headerInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.6, ease: [0.25, 0.1, 0, 1] }}
-            className="text-center py-10 px-6  border-t border-gray"
+            className="text-center py-8 md:py-10 px-6 border-t border-gray"
           >
-            <h2 className="text-background text-5xl font-light mb-6 leading-tight">
+            <h2 className="text-background text-3xl md:text-5xl font-light mb-4 md:mb-6 leading-tight">
               Foundational Intelligence
             </h2>
-            <p className="font-ki text-background text-base max-w-2xl mx-auto leading-relaxed">
+            <p className="font-ki text-background text-sm md:text-base max-w-2xl mx-auto leading-relaxed">
               Everything Kite does is powered by three core, native capabilities
               that drive how it understands, decides, and acts.
             </p>

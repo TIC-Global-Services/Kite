@@ -115,10 +115,11 @@ export default function Process() {
             <div />
           </div>
 
-          {/* ── Main content row: 2-col × 2-row grid so heights sync ─── */}
+          {/* ── Main content row ────────────────────────────────────────── */}
           <div className="grid grid-cols-1 md:grid-cols-2 md:grid-rows-[auto_1fr] border-b border-gray">
+
             {/* [R1,C1] Dark header */}
-            <div className="bg-primary px-10 py-12 border-b border-gray md:border-r">
+            <div className="bg-primary px-6 md:px-10 py-8 md:py-12 border-b border-gray md:border-r">
               <AnimatePresence mode="wait" custom={direction.current}>
                 <motion.h2
                   key={index}
@@ -127,14 +128,14 @@ export default function Process() {
                   initial="enter"
                   animate="center"
                   exit="exit"
-                  className="text-background text-3xl md:text-5xl font-light leading-snug"
+                  className="text-background text-2xl md:text-5xl font-light leading-snug"
                 >
                   {step.title}
                 </motion.h2>
               </AnimatePresence>
             </div>
 
-            {/* [R1,C2] Empty top-right — arrows pinned to bottom-right */}
+            {/* [R1,C2] Desktop: empty top-right with arrows pinned bottom-right */}
             <div className="relative border-b border-gray hidden md:block">
               <div className="absolute bottom-0 right-0 flex border border-gray">
                 <motion.button
@@ -145,12 +146,7 @@ export default function Process() {
                   className="px-5 py-4 border-r border-gray cursor-pointer"
                   aria-label="Previous"
                 >
-                  <Image
-                    src="/icons/prev-btn.svg"
-                    alt="prev"
-                    width={20}
-                    height={20}
-                  />
+                  <Image src="/icons/prev-btn.svg" alt="prev" width={20} height={20} />
                 </motion.button>
                 <motion.button
                   onClick={() => go(1)}
@@ -160,15 +156,30 @@ export default function Process() {
                   className="px-5 py-4 cursor-pointer"
                   aria-label="Next"
                 >
-                  <Image
-                    src="/icons/next-btn.svg"
-                    alt="next"
-                    width={20}
-                    height={20}
-                  />
+                  <Image src="/icons/next-btn.svg" alt="next" width={20} height={20} />
                 </motion.button>
               </div>
             </div>
+
+            {/* Mobile-only: image */}
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, scale: 0.92 }}
+                animate={{ opacity: 1, scale: 1, transition: { duration: 0.4, ease: EASE_OUT } }}
+                exit={{ opacity: 0, scale: 0.96, transition: { duration: 0.25, ease: EASE_IN } }}
+                className="md:hidden border-b border-gray bg-[#f0ede6] flex items-center justify-center p-8"
+                style={{ minHeight: "40vw" }}
+              >
+                <Image
+                  src={step.img}
+                  alt={step.title}
+                  width={400}
+                  height={400}
+                  className="w-full max-w-[280px] h-auto object-contain"
+                />
+              </motion.div>
+            </AnimatePresence>
 
             {/* [R2,C1] Content */}
             <AnimatePresence mode="wait" custom={direction.current}>
@@ -179,13 +190,13 @@ export default function Process() {
                 initial="enter"
                 animate="center"
                 exit="exit"
-                className="px-10 py-12 flex flex-col gap-6 font-ki md:border-r border-gray"
+                className="px-6 md:px-10 py-8 md:py-12 flex flex-col gap-5 font-ki md:border-r border-gray"
               >
-                <p className="text-foreground text-lg leading-relaxed">
+                <p className="text-foreground text-sm md:text-lg leading-relaxed">
                   {step.desc}
                 </p>
-                <div className="flex flex-col gap-3">
-                  <h4 className="text-[#ff6b00] text-lg">{step.subtitle}</h4>
+                <div className="flex flex-col gap-2.5">
+                  <h4 className="text-[#ff6b00] text-base md:text-lg">{step.subtitle}</h4>
                   <ul className="flex flex-col gap-1.5">
                     {step.bullets.map((b, i) => (
                       <motion.li
@@ -194,7 +205,7 @@ export default function Process() {
                         variants={bulletVariants}
                         initial="hidden"
                         animate="visible"
-                        className="text-foreground text-lg flex items-start gap-2"
+                        className="text-foreground text-sm md:text-lg flex items-start gap-2"
                       >
                         <span className="text-foreground/40 shrink-0">-</span>
                         {b}
@@ -202,26 +213,16 @@ export default function Process() {
                     ))}
                   </ul>
                 </div>
-                <p className="text-foreground text-lg leading-relaxed mt-auto">
+                <p className="text-foreground text-sm md:text-lg leading-relaxed mt-auto pt-2 border-t border-gray/40">
                   {step.footer}
                 </p>
               </motion.div>
             </AnimatePresence>
 
-            {/* [R2,C2] Empty bottom-right with step counter */}
+            {/* [R2,C2] Desktop: image */}
             <div className="relative hidden md:block">
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                 <AnimatePresence mode="wait">
-                  {/* <motion.span
-                    key={index}
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 1.1 }}
-                    transition={{ duration: 0.35, ease: [0.25, 0.1, 0, 1] }}
-                    className="font-ki text-gray text-9xl select-none tabular-nums"
-                  >
-                    {String(index + 1).padStart(2, "0")}
-                  </motion.span> */}
                   <motion.div
                     key={index}
                     initial={{ opacity: 0, scale: 0.8 }}
@@ -234,16 +235,15 @@ export default function Process() {
                       alt={step.title}
                       width={600}
                       height={600}
-                      className=" w-full h-full object-contain"
+                      className="w-full h-full object-contain"
                     />
                   </motion.div>
                 </AnimatePresence>
               </div>
-              {/* Mobile nav arrows */}
             </div>
 
-            {/* Mobile-only arrows */}
-            <div className="flex md:hidden border-t border-gray">
+            {/* Mobile-only arrows + step counter */}
+            <div className="flex md:hidden items-center border-t border-gray">
               <motion.button
                 onClick={() => go(-1)}
                 whileHover={{ backgroundColor: "rgba(44,59,78,0.06)" }}
@@ -251,28 +251,22 @@ export default function Process() {
                 className="px-5 py-4 border-r border-gray cursor-pointer"
                 aria-label="Previous"
               >
-                <Image
-                  src="/icons/prev-btn.svg"
-                  alt="prev"
-                  width={20}
-                  height={20}
-                />
+                <Image src="/icons/prev-btn.svg" alt="prev" width={20} height={20} />
               </motion.button>
               <motion.button
                 onClick={() => go(1)}
                 whileHover={{ backgroundColor: "rgba(44,59,78,0.06)" }}
                 whileTap={{ scale: 0.92 }}
-                className="px-5 py-4 cursor-pointer"
+                className="px-5 py-4 border-r border-gray cursor-pointer"
                 aria-label="Next"
               >
-                <Image
-                  src="/icons/next-btn.svg"
-                  alt="next"
-                  width={20}
-                  height={20}
-                />
+                <Image src="/icons/next-btn.svg" alt="next" width={20} height={20} />
               </motion.button>
+              <span className="font-ki text-sm text-foreground/40 px-5">
+                {String(index + 1).padStart(2, "0")} / {String(total).padStart(2, "0")}
+              </span>
             </div>
+
           </div>
 
           {/* ── Bottom spacer row ───────────────────────────────────────── */}
