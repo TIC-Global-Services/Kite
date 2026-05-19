@@ -123,7 +123,7 @@ export default function Industries() {
       <ContainerLayout disablePaddingY>
         <div className=" border-x border-gray border-b">
           {/* ── Header ── */}
-          <div className=" border-b  pt-20 border-gray">
+          <div className=" border-b  pt-10 md:pt-20 border-gray">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 p-6 md:p-10 border-t border-gray">
               <h2 className="text-4xl md:text-6xl leading-[1.05]">
                 Customized

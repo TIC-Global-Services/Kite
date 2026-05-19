@@ -664,10 +664,12 @@ export default function TownScene({
             transition={{ duration: 0.35, ease: [0.25, 0.1, 0, 1] }}
             className="absolute z-30 pointer-events-none select-none"
             style={isMobile ? {
-              left: "4%",
-              right: "4%",
+              left: "0",
+              right: "0",
               top: "4%",
               maxWidth: "100%",
+              padding: "0 6%",
+              textAlign: place.id === 8 ? "center" : "left",
             } : {
               left: `${cx}%`,
               top: `${cy}%`,
@@ -676,7 +678,7 @@ export default function TownScene({
           >
             <h2
               className="text-[#1C2632] font-light leading-[1.1] mb-1.5 drop-shadow-lg"
-              style={{ fontSize: isMobile ? `${Math.min(fs, 1.25)}rem` : `${fs}rem` }}
+              style={{ fontSize: isMobile ? (place.id === 8 ? "clamp(2.25rem,10vw,3.5rem)" : `${Math.min(fs, 1.25)}rem`) : `${fs}rem` }}
             >
               {place.nameHighlight
                 ? place.name.split(place.nameHighlight).flatMap((part, i, arr) =>

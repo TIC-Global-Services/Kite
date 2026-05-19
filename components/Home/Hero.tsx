@@ -67,10 +67,12 @@ const Hero = () => {
   const [activePlace, setActivePlace] = useState<number>(-1);
   const [dotsVisible, setDotsVisible] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 768);
     check();
+    setMounted(true);
     window.addEventListener("resize", check);
     return () => window.removeEventListener("resize", check);
   }, []);
@@ -88,6 +90,7 @@ const Hero = () => {
 
   useGSAP(
     () => {
+      if (!mounted) return;
       const triggerEl = isMobile ? mobileContainerRef.current : containerRef.current;
       if (!triggerEl) return;
 
@@ -138,7 +141,7 @@ const Hero = () => {
 
       tl.to({}, { duration: 0.8 });
     },
-    { dependencies: [isMobile] }
+    { dependencies: [isMobile, mounted] }
   );
 
   // ── Render ──────────────────────────────────────────────────────────────

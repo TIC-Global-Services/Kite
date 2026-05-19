@@ -134,7 +134,7 @@ export default function ContactForm() {
           <div className="flex flex-col border-b md:border-b-0 border-x border-gray py-20">
 
             {/* Dark header */}
-            <div className="bg-primary text-background p-10 space-y-3 border-b border-gray">
+            <div className="bg-primary text-background p-6 md:p-10 space-y-3 border-b border-gray">
               <h2 className="text-5xl text-background">Let's Talk</h2>
               <p className="font-ki text-background">
                 Share a few details and we'll take it from there.
@@ -142,7 +142,7 @@ export default function ContactForm() {
             </div>
 
             {/* Form fields */}
-            <div className="p-10 space-y-8 flex-1 border-b border-gray">
+            <div className=" p-6 md:p-10 space-y-8 flex-1 border-b border-gray">
               <FormField
                 label="Your Name"
                 placeholder="What's your good name?"
@@ -197,7 +197,7 @@ export default function ContactForm() {
             </div>
 
             {/* Privacy + submit — internally reversed on mobile: button first */}
-            <div className="p-10 flex flex-col-reverse md:flex-col items-start gap-6 border-b border-gray">
+            <div className=" p-6 md:p-10 flex flex-col-reverse md:flex-col items-start gap-6 border-b border-gray">
               <p className="font-ki text-foreground max-w-2xl">
                 We are committed to protecting your privacy. We will never
                 collect information about you without your explicit consent.
