@@ -207,18 +207,18 @@ const Hero = () => {
         </div>
 
         {/* Buttons */}
-        <div className="flex items-center gap-4 px-6 py-4 border-t border-gray shrink-0 bg-background">
+        <div className="flex items-center gap-2 px-4 py-4 border-t border-gray shrink-0 bg-background">
           <PrimaryButton
             onClick={handleTalkClick}
             showIcon={true}
             isPlaying={isListening}
-            className="text-xs py-2.5"
+            className="text-xs py-2.5 !px-4 !gap-2 whitespace-nowrap shrink-0"
           >
             {isListening ? "Listening…" : "Talk to Kite"}
           </PrimaryButton>
-          <div className="w-0.5 h-5 bg-primary" />
-          <div className="flex items-center gap-2 cursor-pointer group">
-            <p className="transition-all duration-300 tracking-tighter group-hover:tracking-0 font-semibold font-ki text-sm">
+          <div className="w-0.5 h-5 bg-primary shrink-0" />
+          <div className="flex items-center gap-2 cursor-pointer group shrink-0">
+            <p className="transition-all duration-300 tracking-tighter group-hover:tracking-0 font-semibold font-ki text-sm whitespace-nowrap">
               Swap your Voice
             </p>
             <DotIcon />
