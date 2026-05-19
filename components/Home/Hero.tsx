@@ -265,13 +265,13 @@ const Hero = () => {
                 onClick={handleTalkClick}
                 showIcon={true}
                 isPlaying={isListening}
-                className="text-sm py-3"
+                className=" text-xs md:text-sm py-3"
               >
                 {isListening ? "Listening…" : "Talk to Kite"}
               </PrimaryButton>
               <div className="w-0.5 h-6 bg-primary" />
               <div className="flex items-center gap-3 cursor-pointer group">
-                <p className="transition-all duration-300 tracking-tighter group-hover:tracking-0 font-semibold font-ki">
+                <p className="transition-all text-xs md:text-sm duration-300 tracking-tighter group-hover:tracking-0 font-semibold font-ki">
                   Swap your Voice
                 </p>
                 <DotIcon />
