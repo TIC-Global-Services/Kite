@@ -20,9 +20,10 @@ const STEPS = [
     ],
     footer:
       "Backed by award-winning research and trusted by millions of developers through AutoGen and StateFlow.",
+    img: "/assets/process/1.png",
   },
   {
-    title: "Deploy at Scale",
+    title: "Build & Evolve",
     desc: "Push your AI workflows to production with zero infrastructure friction. Kite handles orchestration, load balancing, and failover — so your agents stay resilient under any load.",
     subtitle: "What It Enables:",
     bullets: [
@@ -33,9 +34,10 @@ const STEPS = [
     ],
     footer:
       "Trusted by enterprise teams shipping millions of agent calls daily with sub-100ms median latency.",
+    img: "/assets/process/2.png",
   },
   {
-    title: "Monitor & Optimize",
+    title: "Deploy Everywhere",
     desc: "Gain full observability into every agent decision, token spend, and workflow bottleneck. Continuously improve performance with actionable real-time insights.",
     subtitle: "What It Enables:",
     bullets: [
@@ -46,19 +48,7 @@ const STEPS = [
     ],
     footer:
       "Purpose-built dashboards designed for ML engineers and platform teams who demand production-grade visibility.",
-  },
-  {
-    title: "Secure & Govern",
-    desc: "Enterprise-grade security baked into every layer. Define access policies, audit every action, and ensure compliance across all agent interactions without slowing down development.",
-    subtitle: "What It Enables:",
-    bullets: [
-      "Role-Based Access Control",
-      "Full Audit Trail per Workflow",
-      "Data Residency Controls",
-      "SOC 2 & GDPR Aligned Runtime",
-    ],
-    footer:
-      "Designed in partnership with enterprise security teams to meet the strictest compliance requirements.",
+    img: "/assets/process/3.png",
   },
 ];
 
@@ -127,7 +117,6 @@ export default function Process() {
 
           {/* ── Main content row: 2-col × 2-row grid so heights sync ─── */}
           <div className="grid grid-cols-1 md:grid-cols-2 md:grid-rows-[auto_1fr] border-b border-gray">
-
             {/* [R1,C1] Dark header */}
             <div className="bg-primary px-10 py-12 border-b border-gray md:border-r">
               <AnimatePresence mode="wait" custom={direction.current}>
@@ -156,7 +145,12 @@ export default function Process() {
                   className="px-5 py-4 border-r border-gray cursor-pointer"
                   aria-label="Previous"
                 >
-                  <Image src="/icons/prev-btn.svg" alt="prev" width={20} height={20} />
+                  <Image
+                    src="/icons/prev-btn.svg"
+                    alt="prev"
+                    width={20}
+                    height={20}
+                  />
                 </motion.button>
                 <motion.button
                   onClick={() => go(1)}
@@ -166,7 +160,12 @@ export default function Process() {
                   className="px-5 py-4 cursor-pointer"
                   aria-label="Next"
                 >
-                  <Image src="/icons/next-btn.svg" alt="next" width={20} height={20} />
+                  <Image
+                    src="/icons/next-btn.svg"
+                    alt="next"
+                    width={20}
+                    height={20}
+                  />
                 </motion.button>
               </div>
             </div>
@@ -213,7 +212,7 @@ export default function Process() {
             <div className="relative hidden md:block">
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                 <AnimatePresence mode="wait">
-                  <motion.span
+                  {/* <motion.span
                     key={index}
                     initial={{ opacity: 0, scale: 0.8 }}
                     animate={{ opacity: 1, scale: 1 }}
@@ -222,7 +221,22 @@ export default function Process() {
                     className="font-ki text-gray text-9xl select-none tabular-nums"
                   >
                     {String(index + 1).padStart(2, "0")}
-                  </motion.span>
+                  </motion.span> */}
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 1.1 }}
+                    transition={{ duration: 0.35, ease: [0.25, 0.1, 0, 1] }}
+                  >
+                    <Image
+                      src={step.img}
+                      alt={step.title}
+                      width={600}
+                      height={600}
+                      className=" w-full h-full object-contain"
+                    />
+                  </motion.div>
                 </AnimatePresence>
               </div>
               {/* Mobile nav arrows */}
@@ -237,7 +251,12 @@ export default function Process() {
                 className="px-5 py-4 border-r border-gray cursor-pointer"
                 aria-label="Previous"
               >
-                <Image src="/icons/prev-btn.svg" alt="prev" width={20} height={20} />
+                <Image
+                  src="/icons/prev-btn.svg"
+                  alt="prev"
+                  width={20}
+                  height={20}
+                />
               </motion.button>
               <motion.button
                 onClick={() => go(1)}
@@ -246,7 +265,12 @@ export default function Process() {
                 className="px-5 py-4 cursor-pointer"
                 aria-label="Next"
               >
-                <Image src="/icons/next-btn.svg" alt="next" width={20} height={20} />
+                <Image
+                  src="/icons/next-btn.svg"
+                  alt="next"
+                  width={20}
+                  height={20}
+                />
               </motion.button>
             </div>
           </div>

@@ -15,6 +15,7 @@ body {
   background: var(--color-background);
   color: var(--color-foreground);
   font-family: var(--font-aeonik);
+  overflow-x: hidden;
 }
 
 .mask-gradient {

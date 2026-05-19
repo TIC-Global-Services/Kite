@@ -32,7 +32,7 @@ const Footer = () => {
           <div className="flex flex-col md:border-r border-b md:border-b-0 md:border-t border-gray">
 
             {/* GIF — always visible */}
-            <div className="relative overflow-hidden border-b border-gray h-70 md:h-auto md:flex-1">
+            <div className="relative overflow-hidden border-b border-gray min-h-[200px] h-70 md:h-auto md:flex-1">
               <Image src="/assets/gif/loop3.gif" alt="Kite" fill className="object-cover" unoptimized />
             </div>
 

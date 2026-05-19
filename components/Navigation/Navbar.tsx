@@ -4,7 +4,7 @@ import DotIcon from "../Reusable/Icons/DotIcon";
 
 const Navbar = () => {
   return (
-    <div className="fixed top-0 w-full h-[9dvh] flex items-center justify-between px-10 bg-background z-99 border-b border-gray">
+    <div className="fixed top-0 w-full min-h-[9dvh] flex items-center justify-between px-10 bg-background z-99 border-b border-gray">
       <div>
         <img src="/logo.png" alt="Kite AI Logo" className="w-16 h-16 object-contain" />
       </div>

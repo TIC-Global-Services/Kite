@@ -3,5 +3,5 @@
 import { Leva } from "leva";
 
 export default function LevaPanel() {
-  return <Leva />;
+  return <Leva hidden />;
 }

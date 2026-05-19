@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useMemo, useEffect, useState, Suspense } from "react";
+import { useRef, useMemo, useEffect, useState, useCallback, Suspense } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { useGLTF, useAnimations, Environment, Stats } from "@react-three/drei";
 import * as THREE from "three";
@@ -16,12 +16,14 @@ export interface PlaceConfig {
   rotation: [number, number, number]; // euler angles in radians
   name: string;
   subText?: string;
-  desc: string;
+  desc?: string;
   targetSize: number; // per-model base size in world units
   cx: number;   // content overlay X %
   cy: number;   // content overlay Y %
   maxW: number; // content overlay max-width px
   fontSize: number; // title font size rem
+  descFontSize: number; // description font size rem
+  nameHighlight?: string; // substring of name to render in orange
 }
 
 export const PLACES: PlaceConfig[] = [
@@ -34,7 +36,7 @@ export const PLACES: PlaceConfig[] = [
     targetSize: 90,
     name: "From Input to Intelligence",
     desc: "Every signal flows into a system purpose-built to interpret context, make intelligent decisions, and take meaningful action in real time—transforming raw inputs into precise, outcome-driven responses.",
-    cx: 5, cy: 60, maxW: 420, fontSize: 2.25,
+    cx: 3, cy: 5, maxW: 520, fontSize: 1.5, descFontSize: 0.90,
   },
   {
     id: 2,
@@ -45,7 +47,7 @@ export const PLACES: PlaceConfig[] = [
     name: "Orchestrate Intelligence",
     subText: "Unify Every Agent. Eliminate Fragmentation.",
     desc: "Break the barriers between disconnected AI systems. Kite brings agents together into a unified, real-time network that collaborates, thinks collectively, and operates as one intelligent workforce.",
-    cx: 5, cy: 55, maxW: 420, fontSize: 2.25,
+    cx: 3, cy: 70, maxW: 600, fontSize: 1.5, descFontSize: 0.90,
   },
   {
     id: 3,
@@ -55,7 +57,7 @@ export const PLACES: PlaceConfig[] = [
     targetSize: 28,
     name: "Composable Workflow Intelligence",
     desc: "Break the barriers between disconnected AI systems. Kite brings agents together into a unified, real-time network that collaborates, thinks collectively, and operates as one intelligent workforce.",
-    cx: 55, cy: 60, maxW: 420, fontSize: 2.25,
+    cx: 60, cy: 5, maxW: 460, fontSize: 1.50, descFontSize: 0.90,
   },
   {
     id: 4,
@@ -65,7 +67,7 @@ export const PLACES: PlaceConfig[] = [
     targetSize: 22,
     name: "Unified Tooling Layer",
     desc: "A powerful abstraction layer that seamlessly exposes browsers, databases, APIs, cloud platforms, and file systems to your workers. It standardizes access to external tools, enabling smooth integration, secure interactions, and consistent execution across diverse environments.",
-    cx: 5, cy: 50, maxW: 420, fontSize: 2.25,
+    cx: 3, cy: 5, maxW: 550, fontSize: 1.50, descFontSize: 0.90,
   },
   // Direction turns here — row 2 comes back left (places 5–7)
   {
@@ -76,7 +78,7 @@ export const PLACES: PlaceConfig[] = [
     targetSize: 26,
     name: "Autonomous Execution Workers",
     desc: "Run tasks through isolated execution services designed for reliability and precision—handling both deterministic operations and LLM-driven actions. Each worker operates independently, ensuring scalable performance, fault tolerance, and consistent outcomes across every workflow.",
-    cx: 55, cy: 55, maxW: 420, fontSize: 2.25,
+    cx: 3, cy: 5, maxW: 550, fontSize: 1.50, descFontSize: 0.90,
   },
   {
     id: 6,
@@ -86,7 +88,7 @@ export const PLACES: PlaceConfig[] = [
     targetSize: 22,
     name: "Persistent Intelligence Layer",
     desc: "Maintain continuity with a robust memory system that stores embeddings, logs, task states, and structured knowledge over time. It enables your system to learn, adapt, and make more informed decisions—turning every interaction into lasting intelligence.",
-    cx: 5, cy: 65, maxW: 420, fontSize: 2.25,
+    cx: 60, cy: 5, maxW: 520, fontSize: 1.50, descFontSize: 0.90,
   },
   {
     id: 7,
@@ -96,7 +98,7 @@ export const PLACES: PlaceConfig[] = [
     targetSize: 28,
     name: "Built-in Governance & Safety",
     desc: "A dedicated policy engine that enforces permissions, compliance rules, rate limits, and safety controls at every step. It ensures secure, reliable operations while maintaining strict governance—so every action stays aligned with defined boundaries and standards.",
-    cx: 55, cy: 50, maxW: 420, fontSize: 2.25,
+    cx: 3, cy: 5, maxW: 500, fontSize: 1.50, descFontSize: 0.90,
   },
   {
     id: 8,
@@ -105,8 +107,8 @@ export const PLACES: PlaceConfig[] = [
     rotation: [0, 0, 0],
     targetSize: 28,
     name: "Introducing Kite AI",
-    desc: "Secured intelligence — where critical knowledge is preserved and protected.",
-    cx: 5, cy: 60, maxW: 420, fontSize: 2.25,
+    nameHighlight: "Kite AI",
+    cx: 3, cy: 5, maxW: 520, fontSize: 5.25, descFontSize: 1.125,
   },
 ];
 
@@ -180,6 +182,31 @@ function CameraRig({ progressRef, debugRef }: { progressRef: React.RefObject<num
     }
   });
 
+  return null;
+}
+
+// ── Waypoint segment → content index sync ─────────────────────────────────
+
+function WaypointSync({
+  progressRef,
+  onSegmentChange,
+}: {
+  progressRef: React.RefObject<number>;
+  onSegmentChange: (i: number) => void;
+}) {
+  const lastEffective = useRef(-2);
+  useFrame(() => {
+    const p = THREE.MathUtils.clamp(progressRef.current ?? 0, 0, 1);
+    const raw = p * (WAYPOINTS.length - 1);
+    const seg = Math.min(Math.floor(raw), WAYPOINTS.length - 2);
+    const t = raw - seg;
+    // Only show content after 30% through each waypoint segment
+    const effective = t >= 0.3 ? seg : -1;
+    if (effective !== lastEffective.current) {
+      lastEffective.current = effective;
+      onSegmentChange(effective);
+    }
+  });
   return null;
 }
 
@@ -499,7 +526,7 @@ function SceneContent() {
 
   return (
     <>
-      <Stats />
+      {/* <Stats /> */}
 
       <ambientLight intensity={ambientIntensity} />
       <directionalLight
@@ -559,15 +586,9 @@ export default function TownScene({
 }) {
   const debugRef = useRef<HTMLDivElement | null>(null);
 
-  // Keep showing last visible place until a new one arrives
-  const lastPlaceRef = useRef<number>(-1);
-  const [displayedIndex, setDisplayedIndex] = useState<number>(-1);
-  useEffect(() => {
-    if (activePlaceIndex >= 0) {
-      lastPlaceRef.current = activePlaceIndex;
-      setDisplayedIndex(activePlaceIndex);
-    }
-  }, [activePlaceIndex]);
+  // Tracks which waypoint segment the camera is in (0 = WP0→1, 1 = WP1→2, …)
+  const [waypointIndex, setWaypointIndex] = useState(0);
+  const handleSegmentChange = useCallback((i: number) => setWaypointIndex(i), []);
 
   // Per-place content style controls
   const cp = useControls("Content Positions", {
@@ -576,16 +597,19 @@ export default function TownScene({
         [`p${p.id}x`,  { value: p.cx,       min: 0,   max: 95,   step: 1,    label: `P${p.id} X %`       }],
         [`p${p.id}y`,  { value: p.cy,       min: 0,   max: 95,   step: 1,    label: `P${p.id} Y %`       }],
         [`p${p.id}w`,  { value: p.maxW,     min: 100, max: 1200, step: 10,   label: `P${p.id} MaxW px`   }],
-        [`p${p.id}fs`, { value: p.fontSize, min: 0.5, max: 6,    step: 0.05, label: `P${p.id} Title rem` }],
+        [`p${p.id}fs`,  { value: p.fontSize,     min: 0.5, max: 6,    step: 0.05, label: `P${p.id} Title rem` }],
+        [`p${p.id}dfs`, { value: p.descFontSize, min: 0.5, max: 4,    step: 0.05, label: `P${p.id} Desc rem`  }],
       ])
     ),
   }) as Record<string, number>;
 
-  const place = displayedIndex >= 0 ? PLACES[displayedIndex] : null;
+  // Pick content by waypoint segment; hide only during t < 0.3 (handled by WaypointSync)
+  const place = waypointIndex >= 0 ? PLACES[waypointIndex] : null;
   const cx = place ? cp[`p${place.id}x`]  : 5;
   const cy = place ? cp[`p${place.id}y`]  : 60;
   const cw = place ? cp[`p${place.id}w`]  : 420;
-  const fs = place ? cp[`p${place.id}fs`] : 2.25;
+  const fs  = place ? cp[`p${place.id}fs`]  : 2.25;
+  const dfs = place ? cp[`p${place.id}dfs`] : 1.125;
 
   return (
     <div className="w-full h-full relative">
@@ -595,6 +619,7 @@ export default function TownScene({
         gl={{ alpha: true, antialias: true, powerPreference: "high-performance" }}
       >
         <CameraRig progressRef={progressRef} debugRef={debugRef} />
+        <WaypointSync progressRef={progressRef} onSegmentChange={handleSegmentChange} />
         <Suspense fallback={null}>
           <SceneContent />
         </Suspense>
@@ -616,23 +641,25 @@ export default function TownScene({
               maxWidth: cw,
             }}
           >
-            <h2 className="text-[#1C2632] font-light leading-snug mb-2 drop-shadow-lg" style={{ fontSize: `${fs}rem` }}>
-              {place.name}
+            <h2 className="text-[#1C2632] font-light leading-[1.1] mb-1.5 drop-shadow-lg" style={{ fontSize: `${fs}rem` }}>
+              {place.nameHighlight
+                ? place.name.split(place.nameHighlight).flatMap((part, i, arr) =>
+                    i < arr.length - 1
+                      ? [part, <span key={i} className="text-[#ff6b00]">{place.nameHighlight}</span>]
+                      : [part]
+                  )
+                : place.name}
             </h2>
             {place.subText && (
-              <p className="font-ki text-[#ff6b00] text-sm mb-2">{place.subText}</p>
+              <p className="font-ki text-[#ff6b00] text-sm mb-1.5">{place.subText}</p>
             )}
-            <p className="font-ki text-foreground text-lg leading-relaxed drop-shadow">
+            <p className="font-ki text-foreground leading-[1.4] drop-shadow" style={{ fontSize: `${dfs}rem` }}>
               {place.desc}
             </p>
           </motion.div>
         )}
       </AnimatePresence>
 
-      <div
-        ref={debugRef}
-        className="absolute bottom-4 left-4 font-mono text-xs text-white bg-black/60 px-2 py-1 rounded pointer-events-none"
-      />
     </div>
   );
 }

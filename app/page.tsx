@@ -8,7 +8,7 @@ import LevaPanel from "@/components/Layout/LevaPanel";
 
 export default function Home() {
   return (
-    <div>
+    <div className=" overflow-x-hidden">
       <LevaPanel />
       <Hero />
       <Process />

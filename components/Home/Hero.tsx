@@ -182,7 +182,7 @@ const Hero = () => {
             </div>
 
             <div className="border-x border-gray p-10 space-y-6">
-              <h1 className="text-6xl">
+              <h1 className="text-[clamp(2.5rem,6.5dvh,4.75rem)] leading-tight">
                 Make AI see, think,
                 <br />
                 reason, and execute
