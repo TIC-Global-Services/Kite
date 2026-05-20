@@ -243,20 +243,23 @@ function Place({
   rotation,
   targetSize,
   sizeMultiplier,
+  isMobile,
 }: {
   url: string;
   position: [number, number, number];
   rotation?: [number, number, number];
   targetSize: number;
   sizeMultiplier: number;
+  isMobile?: boolean;
 }) {
   const { scene, animations } = useGLTF(url);
   const groupRef = useRef<THREE.Group>(null);
   const { actions } = useAnimations(animations, groupRef);
 
   useEffect(() => {
+    if (isMobile) return;
     Object.values(actions).forEach((action) => action?.reset().play());
-  }, [actions]);
+  }, [actions, isMobile]);
 
   const nativeRef = useRef<{ maxDim: number; minY: number } | null>(null);
   if (!nativeRef.current) {
@@ -310,7 +313,7 @@ const ENV_PRESETS = [
 const S = 1; // step for position sliders
 const R = 0.05; // step for rotation sliders
 
-function SceneContent() {
+function SceneContent({ isMobile }: { isMobile?: boolean }) {
   // ── Env / lighting ────────────────────────────────────────────────────
   const {
     envPreset,
@@ -565,11 +568,14 @@ function SceneContent() {
       />
       <hemisphereLight args={["#fff8ee", "#d4c9a8", 0.4]} />
 
-      <Environment
-        preset={envPreset as (typeof ENV_PRESETS)[number]}
-        background={envVisible}
-        backgroundBlurriness={envBlur}
-      />
+      {/* HDR environment is expensive on iOS — skip on mobile to prevent OOM crash */}
+      {!isMobile && (
+        <Environment
+          preset={envPreset as (typeof ENV_PRESETS)[number]}
+          background={envVisible}
+          backgroundBlurriness={envBlur}
+        />
+      )}
 
       {groundVisible && (
         <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, groundY, 0]}>
@@ -591,6 +597,7 @@ function SceneContent() {
           rotation={p.rotation}
           targetSize={p.targetSize}
           sizeMultiplier={sizeMultiplier * perPlaceScale[i]}
+          isMobile={isMobile}
         />
       ))}
     </>
@@ -643,13 +650,22 @@ export default function TownScene({
       <Canvas
         className="w-full h-full"
         camera={{ position: [-56, 7, 47], fov: 55, near: 0.1, far: 600 }}
-        gl={{ alpha: true, antialias: true, powerPreference: "high-performance" }}
+        // Cap DPR to 1 on mobile — iOS retina is DPR 2–3 which multiplies GPU
+        // memory 4–9× and is the primary cause of the Safari OOM crash.
+        dpr={isMobile ? 1 : [1, 2]}
+        gl={{
+          alpha: true,
+          // Antialias is redundant at DPR≥2 and doubles framebuffer memory on mobile
+          antialias: !isMobile,
+          // "high-performance" on iOS allocates an oversized GPU context; "default" is safer
+          powerPreference: isMobile ? "default" : "high-performance",
+        }}
       >
         <MobileFOV isMobile={isMobile} />
         <CameraRig progressRef={progressRef} debugRef={debugRef} isMobile={isMobile} />
         <WaypointSync progressRef={progressRef} onSegmentChange={handleSegmentChange} />
         <Suspense fallback={null}>
-          <SceneContent />
+          <SceneContent isMobile={isMobile} />
         </Suspense>
       </Canvas>
 
