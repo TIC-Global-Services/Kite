@@ -31,28 +31,28 @@ const TownScene = dynamic(() => import("./TownScene"), {
 
 // ── Scroll progress → which place is active ───────────────────────────────
 //
-// Scroll phases (0–1 maps to 500vh of scroll via GSAP pin):
-//   0.00 – 0.20  Canvas expands right-half → full-screen, left panel fades
-//   0.20 – 0.25  Place 1  (WP 0)
-//   0.25 – 0.35  Place 2  (WP 1)
-//   0.35 – 0.45  Place 3  (WP 2)
-//   0.45 – 0.55  Place 4  (WP 3)
-//   0.55 – 0.65  Place 5  (WP 4)
-//   0.65 – 0.75  Place 6  (WP 5)
-//   0.75 – 0.85  Place 7  (WP 6)
-//   0.85 – 0.95  Place 8  (WP 7)
-//   0.95 – 1.00  Drone overview — all models (no label)
+// Scroll phases (0–1 maps to scroll via GSAP pin):
+//   0.00 – 0.08  Canvas expands right-half → full-screen, left panel fades
+//   0.08 – 0.18  Place 1  (WP 0)
+//   0.18 – 0.28  Place 2  (WP 1)
+//   0.28 – 0.38  Place 3  (WP 2)
+//   0.38 – 0.48  Place 4  (WP 3)
+//   0.48 – 0.58  Place 5  (WP 4)
+//   0.58 – 0.68  Place 6  (WP 5)
+//   0.68 – 0.78  Place 7  (WP 6)
+//   0.78 – 0.88  Place 8  (WP 7)
+//   0.88 – 1.00  Drone overview — all models (no label)
 
 function getActivePlace(p: number): number {
-  if (p < 0.20) return -1;   // expansion phase (no label)
-  if (p < 0.25) return 0;    // Place 1
-  if (p < 0.35) return 1;    // Place 2
-  if (p < 0.45) return 2;    // Place 3
-  if (p < 0.55) return 3;    // Place 4
-  if (p < 0.65) return 4;    // Place 5
-  if (p < 0.75) return 5;    // Place 6
-  if (p < 0.85) return 6;    // Place 7
-  if (p < 0.95) return 7;    // Place 8
+  if (p < 0.08) return -1;   // expansion phase (no label)
+  if (p < 0.18) return 0;    // Place 1
+  if (p < 0.28) return 1;    // Place 2
+  if (p < 0.38) return 2;    // Place 3
+  if (p < 0.48) return 3;    // Place 4
+  if (p < 0.58) return 4;    // Place 5
+  if (p < 0.68) return 5;    // Place 6
+  if (p < 0.78) return 6;    // Place 7
+  if (p < 0.88) return 7;    // Place 8
   return -1;                  // drone overview (no label)
 }
 
@@ -114,12 +114,12 @@ const Hero = () => {
             // Clamp at 0.92 (raw ≈ 7.36 in 8-waypoint space, t > 0.3 in last
             // segment so content 8 shows) — prevents camera flying to the
             // dramatic WP8 drone-overview position at the very end of scroll.
-            progressRef.current = Math.min(0.92, Math.max(0, (st.progress - 0.2) / 0.8));
+            progressRef.current = Math.min(0.92, Math.max(0, (st.progress - 0.08) / 0.92));
             const next = getActivePlace(st.progress);
             if (next !== activePlaceRef.current) {
               activePlaceRef.current = next;
               setActivePlace(next);
-              setDotsVisible(st.progress > 0.22);
+              setDotsVisible(st.progress > 0.10);
             }
           },
         },
@@ -130,24 +130,24 @@ const Hero = () => {
         tl.fromTo(
           mobileContentRef.current,
           { autoAlpha: 1, y: 0 },
-          { autoAlpha: 0, y: -60, ease: "power2.in", duration: 0.2 }
+          { autoAlpha: 0, y: -60, ease: "power2.in", duration: 0.08 }
         );
       } else {
         // Desktop: expand canvas clip-path + fade left panel
         tl.fromTo(
           canvasWrapperRef.current,
           { clipPath: "inset(0% 0% 0% 50%)" },
-          { clipPath: "inset(0% 0% 0% 0%)", ease: "power2.inOut", duration: 0.2 }
+          { clipPath: "inset(0% 0% 0% 0%)", ease: "power2.inOut", duration: 0.08 }
         );
         tl.fromTo(
           leftPanelRef.current,
           { autoAlpha: 1, x: 0 },
-          { autoAlpha: 0, x: -36, ease: "power2.in", duration: 0.18 },
+          { autoAlpha: 0, x: -36, ease: "power2.in", duration: 0.07 },
           "<"
         );
       }
 
-      tl.to({}, { duration: 0.8 });
+      tl.to({}, { duration: 0.92 });
     },
     { dependencies: [isMobile, mounted] }
   );
@@ -263,7 +263,7 @@ const Hero = () => {
               </div>
             </div>
 
-            <div className="border-x border-gray p-10 space-y-6">
+            <div className="border-x border-gray p-6 space-y-6">
               <h1 className="text-[clamp(2.5rem,6.5dvh,4.75rem)] leading-tight">
                 Make AI see, think,
                 <br />
@@ -275,7 +275,7 @@ const Hero = () => {
               </p>
             </div>
 
-            <div className="flex items-center gap-6 p-10 border-x border-t border-gray">
+            <div className="flex items-center gap-6 p-6 border-x border-t border-gray">
               <PrimaryButton
                 onClick={handleTalkClick}
                 showIcon={true}
