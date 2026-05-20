@@ -260,9 +260,8 @@ function Place({
   const { actions } = useAnimations(animations, groupRef);
 
   useEffect(() => {
-    if (isMobile) return;
     Object.values(actions).forEach((action) => action?.reset().play());
-  }, [actions, isMobile]);
+  }, [actions]);
 
   const nativeRef = useRef<{ maxDim: number; minY: number } | null>(null);
   if (!nativeRef.current) {
@@ -571,14 +570,11 @@ function SceneContent({ isMobile }: { isMobile?: boolean }) {
       />
       <hemisphereLight args={["#fff8ee", "#d4c9a8", 0.4]} />
 
-      {/* HDR environment is expensive on iOS — skip on mobile to prevent OOM crash */}
-      {!isMobile && (
-        <Environment
-          preset={envPreset as (typeof ENV_PRESETS)[number]}
-          background={envVisible}
-          backgroundBlurriness={envBlur}
-        />
-      )}
+      <Environment
+        preset={envPreset as (typeof ENV_PRESETS)[number]}
+        background={envVisible}
+        backgroundBlurriness={envBlur}
+      />
 
       {groundVisible && (
         <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, groundY, 0]}>
@@ -658,7 +654,7 @@ export default function TownScene({
         performance={{ min: 0.5 }}
         gl={{
           alpha: true,
-          antialias: !isMobile,
+          antialias: true,
           powerPreference: isMobile ? "default" : "high-performance",
           // stencil buffer is never used here; disabling it saves ~25% framebuffer memory on iOS
           stencil: false,

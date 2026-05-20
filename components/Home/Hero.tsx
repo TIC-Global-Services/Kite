@@ -106,7 +106,7 @@ const Hero = () => {
         scrollTrigger: {
           trigger: triggerEl,
           start: "top 9%",
-          end: isMobile ? "+=1000%" : "+=2400%",
+          end: isMobile ? "+=600%" : "+=2400%",
           pin: true,
           pinSpacing: true,
           scrub: isMobile ? 1 : 2,
