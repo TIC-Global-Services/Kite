@@ -653,15 +653,16 @@ export default function TownScene({
       <Canvas
         className="w-full h-full"
         camera={{ position: [-56, 7, 47], fov: 55, near: 0.1, far: 600 }}
-        // Cap DPR to 1 on mobile — iOS retina is DPR 2–3 which multiplies GPU
-        // memory 4–9× and is the primary cause of the Safari OOM crash.
-        dpr={isMobile ? 1 : [1, 2]}
+        // 1.5 cap: much sharper than 1× on retina, but ~2.25× pixels vs 4–9× at 2–3×
+        dpr={isMobile ? [1, 1.5] : [1, 2]}
+        // Auto-lower DPR when FPS drops; iOS GPU is the main constraint
+        performance={{ min: 0.5 }}
         gl={{
           alpha: true,
-          // Antialias is redundant at DPR≥2 and doubles framebuffer memory on mobile
           antialias: !isMobile,
-          // "high-performance" on iOS allocates an oversized GPU context; "default" is safer
           powerPreference: isMobile ? "default" : "high-performance",
+          // stencil buffer is never used here; disabling it saves ~25% framebuffer memory on iOS
+          stencil: false,
         }}
       >
         <MobileFOV isMobile={isMobile} />

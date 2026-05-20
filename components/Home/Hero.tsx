@@ -106,10 +106,10 @@ const Hero = () => {
         scrollTrigger: {
           trigger: triggerEl,
           start: "top 9%",
-          end: "+=2400%",
+          end: isMobile ? "+=1000%" : "+=2400%",
           pin: true,
           pinSpacing: true,
-          scrub: 2,
+          scrub: isMobile ? 1 : 2,
           onUpdate: (st) => {
             // Clamp at 0.92 (raw ≈ 7.36 in 8-waypoint space, t > 0.3 in last
             // segment so content 8 shows) — prevents camera flying to the
