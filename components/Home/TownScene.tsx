@@ -653,8 +653,7 @@ export default function TownScene({
       <Canvas
         className="w-full h-full"
         camera={{ position: [-56, 7, 47], fov: 55, near: 0.1, far: 600 }}
-        // 1.5 cap: much sharper than 1× on retina, but ~2.25× pixels vs 4–9× at 2–3×
-        dpr={isMobile ? [1, 1.5] : [1, 2]}
+        dpr={[1, 2]}
         // Auto-lower DPR when FPS drops; iOS GPU is the main constraint
         performance={{ min: 0.5 }}
         gl={{
