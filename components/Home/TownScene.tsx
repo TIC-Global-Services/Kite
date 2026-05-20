@@ -1,6 +1,13 @@
 "use client";
 
-import { useRef, useMemo, useEffect, useState, useCallback, Suspense } from "react";
+import {
+  useRef,
+  useMemo,
+  useEffect,
+  useState,
+  useCallback,
+  Suspense,
+} from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { useGLTF, useAnimations, Environment, Stats } from "@react-three/drei";
 import * as THREE from "three";
@@ -18,8 +25,8 @@ export interface PlaceConfig {
   subText?: string;
   desc?: string;
   targetSize: number; // per-model base size in world units
-  cx: number;   // content overlay X %
-  cy: number;   // content overlay Y %
+  cx: number; // content overlay X %
+  cy: number; // content overlay Y %
   maxW: number; // content overlay max-width px
   fontSize: number; // title font size rem
   descFontSize: number; // description font size rem
@@ -31,12 +38,16 @@ export const PLACES: PlaceConfig[] = [
   {
     id: 1,
     url: "/Models/1.glb",
-    position: [-35, 0, 38],
+    position: [-33, 0, 40],
     rotation: [0, Math.PI, 0],
     targetSize: 90,
     name: "From Input to Intelligence",
     desc: "Every signal flows into a system purpose-built to interpret context, make intelligent decisions, and take meaningful action in real time—transforming raw inputs into precise, outcome-driven responses.",
-    cx: 3, cy: 5, maxW: 520, fontSize: 1.5, descFontSize: 0.90,
+    cx: 3,
+    cy: 5,
+    maxW: 520,
+    fontSize: 1.5,
+    descFontSize: 0.9,
   },
   {
     id: 2,
@@ -47,7 +58,11 @@ export const PLACES: PlaceConfig[] = [
     name: "Orchestrate Intelligence",
     subText: "Unify Every Agent. Eliminate Fragmentation.",
     desc: "Break the barriers between disconnected AI systems. Kite brings agents together into a unified, real-time network that collaborates, thinks collectively, and operates as one intelligent workforce.",
-    cx: 3, cy: 70, maxW: 600, fontSize: 1.5, descFontSize: 0.90,
+    cx: 3,
+    cy: 70,
+    maxW: 600,
+    fontSize: 1.5,
+    descFontSize: 0.9,
   },
   {
     id: 3,
@@ -57,7 +72,11 @@ export const PLACES: PlaceConfig[] = [
     targetSize: 28,
     name: "Composable Workflow Intelligence",
     desc: "Break the barriers between disconnected AI systems. Kite brings agents together into a unified, real-time network that collaborates, thinks collectively, and operates as one intelligent workforce.",
-    cx: 60, cy: 5, maxW: 460, fontSize: 1.50, descFontSize: 0.90,
+    cx: 60,
+    cy: 5,
+    maxW: 460,
+    fontSize: 1.5,
+    descFontSize: 0.9,
   },
   {
     id: 4,
@@ -67,7 +86,11 @@ export const PLACES: PlaceConfig[] = [
     targetSize: 22,
     name: "Unified Tooling Layer",
     desc: "A powerful abstraction layer that seamlessly exposes browsers, databases, APIs, cloud platforms, and file systems to your workers. It standardizes access to external tools, enabling smooth integration, secure interactions, and consistent execution across diverse environments.",
-    cx: 3, cy: 5, maxW: 550, fontSize: 1.50, descFontSize: 0.90,
+    cx: 3,
+    cy: 5,
+    maxW: 550,
+    fontSize: 1.5,
+    descFontSize: 0.9,
   },
   // Direction turns here — row 2 comes back left (places 5–7)
   {
@@ -78,7 +101,11 @@ export const PLACES: PlaceConfig[] = [
     targetSize: 26,
     name: "Autonomous Execution Workers",
     desc: "Run tasks through isolated execution services designed for reliability and precision—handling both deterministic operations and LLM-driven actions. Each worker operates independently, ensuring scalable performance, fault tolerance, and consistent outcomes across every workflow.",
-    cx: 3, cy: 5, maxW: 550, fontSize: 1.50, descFontSize: 0.90,
+    cx: 3,
+    cy: 5,
+    maxW: 550,
+    fontSize: 1.5,
+    descFontSize: 0.9,
   },
   {
     id: 6,
@@ -88,7 +115,11 @@ export const PLACES: PlaceConfig[] = [
     targetSize: 22,
     name: "Persistent Intelligence Layer",
     desc: "Maintain continuity with a robust memory system that stores embeddings, logs, task states, and structured knowledge over time. It enables your system to learn, adapt, and make more informed decisions—turning every interaction into lasting intelligence.",
-    cx: 60, cy: 5, maxW: 520, fontSize: 1.50, descFontSize: 0.90,
+    cx: 60,
+    cy: 5,
+    maxW: 520,
+    fontSize: 1.5,
+    descFontSize: 0.9,
   },
   {
     id: 7,
@@ -98,7 +129,11 @@ export const PLACES: PlaceConfig[] = [
     targetSize: 28,
     name: "Built-in Governance & Safety",
     desc: "A dedicated policy engine that enforces permissions, compliance rules, rate limits, and safety controls at every step. It ensures secure, reliable operations while maintaining strict governance—so every action stays aligned with defined boundaries and standards.",
-    cx: 3, cy: 5, maxW: 500, fontSize: 1.50, descFontSize: 0.90,
+    cx: 3,
+    cy: 5,
+    maxW: 500,
+    fontSize: 1.5,
+    descFontSize: 0.9,
   },
   {
     id: 8,
@@ -108,75 +143,202 @@ export const PLACES: PlaceConfig[] = [
     targetSize: 28,
     name: "Introducing Kite AI",
     nameHighlight: "Kite AI",
-    cx: 3, cy: 5, maxW: 520, fontSize: 5.25, descFontSize: 1.125,
+    cx: 3,
+    cy: 5,
+    maxW: 520,
+    fontSize: 5.25,
+    descFontSize: 1.125,
   },
 ];
-
-
 
 // ── Camera waypoints (one per model, index 0 = start overview) ────────────
 
 const WAYPOINTS = [
   // 0 — original canvas camera position, target nearest model cluster
-  { pos: [-55,  8,  45], target: [-30,  5,  20] },
+  { pos: [-55, 8, 45], target: [-30, 5, 20] },
   // 1 — Archive  [-35, 0, 38]  size 90  rot π (faces -Z) → camera on -Z side
-  { pos: [-22, 8, 63], target: [-22,  5,  46] },
+  { pos: [-22, 8, 63], target: [-22, 5, 46] },
   // 2 — Relay    [ 78,-2, 39]  size 22  rot 0  (faces +Z) → camera on +Z side
-  { pos: [ 26,  24,  83], target: [ 25,  -2,  20] },
+  { pos: [26, 24, 83], target: [25, -2, 20] },
   // 3 — Core     [-25, 0, 53]  size 28  rot π (faces -Z) → camera on -Z side
-  { pos: [24, 7,  6], target: [107,  1,  5] },
+  { pos: [24, 7, 6], target: [107, 1, 5] },
   // 4 — Bridge  [-105, 0, 85]  size 22  rot π (faces -Z) → camera on -Z side
-  { pos: [25,  7,  -30], target: [128,  -3,  -30] },
+  { pos: [25, 7, -30], target: [128, -3, -30] },
   // 5 — Horizon  [ 50, 0,-30]  size 26  rot 0  (faces +Z) → camera on +Z side
-  { pos: [ 0, 7,   -19], target: [ -2,  4, -55] },
+  { pos: [0, 7, -19], target: [-2, 4, -55] },
   // 6 — Forge    [-58, 0, 85]  size 22  rot π (faces -Z) → camera on -Z side
-  { pos: [-1,  16,  -12], target: [-27,  11,  -11] },
+  { pos: [-1, 16, -12], target: [-27, 11, -11] },
   // 7 — Nexus    [-40, 0, 50]  size 28  rot-π (faces -Z) → camera on -Z side
-  { pos: [-35, 20,  20], target: [0,  -2,  -15] },
+  { pos: [-35, 20, 20], target: [0, -2, -15] },
   // 8 — Vault    [ 40,-5,-65]  size 28  rot 0  (faces +Z) → camera on +Z side
-  { pos: [ -52,  53, 76], target: [ 49,  -71, -72] },
+  { pos: [0, 140, 260], target: [90, -160, -160] },
 ] as const;
 
 // ── Scroll-driven camera ────────────────────────────────────────────────────
 
-const WAYPOINT_NAMES = ["Start","Archive","Relay","Core","Bridge","Horizon","Forge","Nexus","Vault"];
+const WAYPOINT_NAMES = [
+  "Start",
+  "Archive",
+  "Relay",
+  "Core",
+  "Bridge",
+  "Horizon",
+  "Forge",
+  "Nexus",
+  "Vault",
+];
 
-function CameraRig({ progressRef, debugRef, isMobile }: { progressRef: React.RefObject<number>; debugRef: React.RefObject<HTMLDivElement | null>; isMobile: boolean }) {
+function CameraRig({
+  progressRef,
+  debugRef,
+  isMobile,
+}: {
+  progressRef: React.RefObject<number>;
+  debugRef: React.RefObject<HTMLDivElement | null>;
+  isMobile: boolean;
+}) {
   const { camera } = useThree();
-  const _pos    = useRef(new THREE.Vector3());
+  const _pos = useRef(new THREE.Vector3());
   const _target = useRef(new THREE.Vector3());
-  const _dir    = useRef(new THREE.Vector3());
+  const _dir = useRef(new THREE.Vector3());
 
   const wp = useControls("Camera Waypoints", {
-    "0 — Start":   folder({ w0px:{value:WAYPOINTS[0].pos[0],step:1,label:"Pos X"},   w0py:{value:WAYPOINTS[0].pos[1],step:1,label:"Pos Y"},   w0pz:{value:WAYPOINTS[0].pos[2],step:1,label:"Pos Z"},   w0tx:{value:WAYPOINTS[0].target[0],step:1,label:"Tgt X"},  w0ty:{value:WAYPOINTS[0].target[1],step:1,label:"Tgt Y"},  w0tz:{value:WAYPOINTS[0].target[2],step:1,label:"Tgt Z"}  }, {collapsed:true}),
-    "1 — Archive": folder({ w1px:{value:WAYPOINTS[1].pos[0],step:1,label:"Pos X"},   w1py:{value:WAYPOINTS[1].pos[1],step:1,label:"Pos Y"},  w1pz:{value:WAYPOINTS[1].pos[2],step:1,label:"Pos Z"},  w1tx:{value:WAYPOINTS[1].target[0],step:1,label:"Tgt X"}, w1ty:{value:WAYPOINTS[1].target[1],step:1,label:"Tgt Y"},  w1tz:{value:WAYPOINTS[1].target[2],step:1,label:"Tgt Z"}  }, {collapsed:true}),
-    "2 — Relay":   folder({ w2px:{value:WAYPOINTS[2].pos[0],step:1,label:"Pos X"},   w2py:{value:WAYPOINTS[2].pos[1],step:1,label:"Pos Y"},   w2pz:{value:WAYPOINTS[2].pos[2],step:1,label:"Pos Z"},   w2tx:{value:WAYPOINTS[2].target[0],step:1,label:"Tgt X"},  w2ty:{value:WAYPOINTS[2].target[1],step:1,label:"Tgt Y"},  w2tz:{value:WAYPOINTS[2].target[2],step:1,label:"Tgt Z"}  }, {collapsed:true}),
-    "3 — Core":    folder({ w3px:{value:WAYPOINTS[3].pos[0],step:1,label:"Pos X"},   w3py:{value:WAYPOINTS[3].pos[1],step:1,label:"Pos Y"},  w3pz:{value:WAYPOINTS[3].pos[2],step:1,label:"Pos Z"},   w3tx:{value:WAYPOINTS[3].target[0],step:1,label:"Tgt X"}, w3ty:{value:WAYPOINTS[3].target[1],step:1,label:"Tgt Y"},  w3tz:{value:WAYPOINTS[3].target[2],step:1,label:"Tgt Z"}  }, {collapsed:true}),
-    "4 — Bridge":  folder({ w4px:{value:WAYPOINTS[4].pos[0],step:1,label:"Pos X"},  w4py:{value:WAYPOINTS[4].pos[1],step:1,label:"Pos Y"},   w4pz:{value:WAYPOINTS[4].pos[2],step:1,label:"Pos Z"},   w4tx:{value:WAYPOINTS[4].target[0],step:1,label:"Tgt X"}, w4ty:{value:WAYPOINTS[4].target[1],step:1,label:"Tgt Y"},  w4tz:{value:WAYPOINTS[4].target[2],step:1,label:"Tgt Z"}  }, {collapsed:true}),
-    "5 — Horizon": folder({ w5px:{value:WAYPOINTS[5].pos[0],step:1,label:"Pos X"},   w5py:{value:WAYPOINTS[5].pos[1],step:1,label:"Pos Y"},  w5pz:{value:WAYPOINTS[5].pos[2],step:1,label:"Pos Z"},   w5tx:{value:WAYPOINTS[5].target[0],step:1,label:"Tgt X"}, w5ty:{value:WAYPOINTS[5].target[1],step:1,label:"Tgt Y"},  w5tz:{value:WAYPOINTS[5].target[2],step:1,label:"Tgt Z"} }, {collapsed:true}),
-    "6 — Forge":   folder({ w6px:{value:WAYPOINTS[6].pos[0],step:1,label:"Pos X"},   w6py:{value:WAYPOINTS[6].pos[1],step:1,label:"Pos Y"},   w6pz:{value:WAYPOINTS[6].pos[2],step:1,label:"Pos Z"},   w6tx:{value:WAYPOINTS[6].target[0],step:1,label:"Tgt X"}, w6ty:{value:WAYPOINTS[6].target[1],step:1,label:"Tgt Y"},  w6tz:{value:WAYPOINTS[6].target[2],step:1,label:"Tgt Z"}  }, {collapsed:true}),
-    "7 — Nexus":   folder({ w7px:{value:WAYPOINTS[7].pos[0],step:1,label:"Pos X"},   w7py:{value:WAYPOINTS[7].pos[1],step:1,label:"Pos Y"},  w7pz:{value:WAYPOINTS[7].pos[2],step:1,label:"Pos Z"},   w7tx:{value:WAYPOINTS[7].target[0],step:1,label:"Tgt X"}, w7ty:{value:WAYPOINTS[7].target[1],step:1,label:"Tgt Y"},  w7tz:{value:WAYPOINTS[7].target[2],step:1,label:"Tgt Z"}  }, {collapsed:true}),
-    "8 — Vault":   folder({ w8px:{value:WAYPOINTS[8].pos[0],step:1,label:"Pos X"},   w8py:{value:WAYPOINTS[8].pos[1],step:1,label:"Pos Y"},   w8pz:{value:WAYPOINTS[8].pos[2],step:1,label:"Pos Z"},  w8tx:{value:WAYPOINTS[8].target[0],step:1,label:"Tgt X"},  w8ty:{value:WAYPOINTS[8].target[1],step:1,label:"Tgt Y"},  w8tz:{value:WAYPOINTS[8].target[2],step:1,label:"Tgt Z"} }, {collapsed:true}),
+    "0 — Start": folder(
+      {
+        w0px: { value: WAYPOINTS[0].pos[0], step: 1, label: "Pos X" },
+        w0py: { value: WAYPOINTS[0].pos[1], step: 1, label: "Pos Y" },
+        w0pz: { value: WAYPOINTS[0].pos[2], step: 1, label: "Pos Z" },
+        w0tx: { value: WAYPOINTS[0].target[0], step: 1, label: "Tgt X" },
+        w0ty: { value: WAYPOINTS[0].target[1], step: 1, label: "Tgt Y" },
+        w0tz: { value: WAYPOINTS[0].target[2], step: 1, label: "Tgt Z" },
+      },
+      { collapsed: true },
+    ),
+    "1 — Archive": folder(
+      {
+        w1px: { value: WAYPOINTS[1].pos[0], step: 1, label: "Pos X" },
+        w1py: { value: WAYPOINTS[1].pos[1], step: 1, label: "Pos Y" },
+        w1pz: { value: WAYPOINTS[1].pos[2], step: 1, label: "Pos Z" },
+        w1tx: { value: WAYPOINTS[1].target[0], step: 1, label: "Tgt X" },
+        w1ty: { value: WAYPOINTS[1].target[1], step: 1, label: "Tgt Y" },
+        w1tz: { value: WAYPOINTS[1].target[2], step: 1, label: "Tgt Z" },
+      },
+      { collapsed: true },
+    ),
+    "2 — Relay": folder(
+      {
+        w2px: { value: WAYPOINTS[2].pos[0], step: 1, label: "Pos X" },
+        w2py: { value: WAYPOINTS[2].pos[1], step: 1, label: "Pos Y" },
+        w2pz: { value: WAYPOINTS[2].pos[2], step: 1, label: "Pos Z" },
+        w2tx: { value: WAYPOINTS[2].target[0], step: 1, label: "Tgt X" },
+        w2ty: { value: WAYPOINTS[2].target[1], step: 1, label: "Tgt Y" },
+        w2tz: { value: WAYPOINTS[2].target[2], step: 1, label: "Tgt Z" },
+      },
+      { collapsed: true },
+    ),
+    "3 — Core": folder(
+      {
+        w3px: { value: WAYPOINTS[3].pos[0], step: 1, label: "Pos X" },
+        w3py: { value: WAYPOINTS[3].pos[1], step: 1, label: "Pos Y" },
+        w3pz: { value: WAYPOINTS[3].pos[2], step: 1, label: "Pos Z" },
+        w3tx: { value: WAYPOINTS[3].target[0], step: 1, label: "Tgt X" },
+        w3ty: { value: WAYPOINTS[3].target[1], step: 1, label: "Tgt Y" },
+        w3tz: { value: WAYPOINTS[3].target[2], step: 1, label: "Tgt Z" },
+      },
+      { collapsed: true },
+    ),
+    "4 — Bridge": folder(
+      {
+        w4px: { value: WAYPOINTS[4].pos[0], step: 1, label: "Pos X" },
+        w4py: { value: WAYPOINTS[4].pos[1], step: 1, label: "Pos Y" },
+        w4pz: { value: WAYPOINTS[4].pos[2], step: 1, label: "Pos Z" },
+        w4tx: { value: WAYPOINTS[4].target[0], step: 1, label: "Tgt X" },
+        w4ty: { value: WAYPOINTS[4].target[1], step: 1, label: "Tgt Y" },
+        w4tz: { value: WAYPOINTS[4].target[2], step: 1, label: "Tgt Z" },
+      },
+      { collapsed: true },
+    ),
+    "5 — Horizon": folder(
+      {
+        w5px: { value: WAYPOINTS[5].pos[0], step: 1, label: "Pos X" },
+        w5py: { value: WAYPOINTS[5].pos[1], step: 1, label: "Pos Y" },
+        w5pz: { value: WAYPOINTS[5].pos[2], step: 1, label: "Pos Z" },
+        w5tx: { value: WAYPOINTS[5].target[0], step: 1, label: "Tgt X" },
+        w5ty: { value: WAYPOINTS[5].target[1], step: 1, label: "Tgt Y" },
+        w5tz: { value: WAYPOINTS[5].target[2], step: 1, label: "Tgt Z" },
+      },
+      { collapsed: true },
+    ),
+    "6 — Forge": folder(
+      {
+        w6px: { value: WAYPOINTS[6].pos[0], step: 1, label: "Pos X" },
+        w6py: { value: WAYPOINTS[6].pos[1], step: 1, label: "Pos Y" },
+        w6pz: { value: WAYPOINTS[6].pos[2], step: 1, label: "Pos Z" },
+        w6tx: { value: WAYPOINTS[6].target[0], step: 1, label: "Tgt X" },
+        w6ty: { value: WAYPOINTS[6].target[1], step: 1, label: "Tgt Y" },
+        w6tz: { value: WAYPOINTS[6].target[2], step: 1, label: "Tgt Z" },
+      },
+      { collapsed: true },
+    ),
+    "7 — Nexus": folder(
+      {
+        w7px: { value: WAYPOINTS[7].pos[0], step: 1, label: "Pos X" },
+        w7py: { value: WAYPOINTS[7].pos[1], step: 1, label: "Pos Y" },
+        w7pz: { value: WAYPOINTS[7].pos[2], step: 1, label: "Pos Z" },
+        w7tx: { value: WAYPOINTS[7].target[0], step: 1, label: "Tgt X" },
+        w7ty: { value: WAYPOINTS[7].target[1], step: 1, label: "Tgt Y" },
+        w7tz: { value: WAYPOINTS[7].target[2], step: 1, label: "Tgt Z" },
+      },
+      { collapsed: true },
+    ),
+    "8 — Vault": folder(
+      {
+        w8px: { value: WAYPOINTS[8].pos[0], step: 1, label: "Pos X" },
+        w8py: { value: WAYPOINTS[8].pos[1], step: 1, label: "Pos Y" },
+        w8pz: { value: WAYPOINTS[8].pos[2], step: 1, label: "Pos Z" },
+        w8tx: { value: WAYPOINTS[8].target[0], step: 1, label: "Tgt X" },
+        w8ty: { value: WAYPOINTS[8].target[1], step: 1, label: "Tgt Y" },
+        w8tz: { value: WAYPOINTS[8].target[2], step: 1, label: "Tgt Z" },
+      },
+      { collapsed: true },
+    ),
   } as any) as Record<string, number>;
 
   useFrame(() => {
     const p = THREE.MathUtils.clamp(progressRef.current ?? 0, 0, 1);
     const last = WAYPOINTS.length - 1;
-    const raw  = p * last;
-    const i    = Math.min(Math.floor(raw), last - 1);
-    const t    = raw - i;
+    const raw = p * last;
+    const i = Math.min(Math.floor(raw), last - 1);
+    const t = raw - i;
 
-    const ai = i, bi = i + 1;
-    const ax = wp[`w${ai}px`], ay = wp[`w${ai}py`], az = wp[`w${ai}pz`];
-    const bx = wp[`w${bi}px`], by = wp[`w${bi}py`], bz = wp[`w${bi}pz`];
-    const atx = wp[`w${ai}tx`], aty = wp[`w${ai}ty`], atz = wp[`w${ai}tz`];
-    const btx = wp[`w${bi}tx`], bty = wp[`w${bi}ty`], btz = wp[`w${bi}tz`];
+    const ai = i,
+      bi = i + 1;
+    const ax = wp[`w${ai}px`],
+      ay = wp[`w${ai}py`],
+      az = wp[`w${ai}pz`];
+    const bx = wp[`w${bi}px`],
+      by = wp[`w${bi}py`],
+      bz = wp[`w${bi}pz`];
+    const atx = wp[`w${ai}tx`],
+      aty = wp[`w${ai}ty`],
+      atz = wp[`w${ai}tz`];
+    const btx = wp[`w${bi}tx`],
+      bty = wp[`w${bi}ty`],
+      btz = wp[`w${bi}tz`];
 
     // Smoothstep eases the camera in/out at each waypoint instead of linear fly-through
     const ts = THREE.MathUtils.smoothstep(t, 0, 1);
 
-    _pos.current.set(ax + (bx-ax)*ts, ay + (by-ay)*ts, az + (bz-az)*ts);
-    _target.current.set(atx + (btx-atx)*ts, aty + (bty-aty)*ts, atz + (btz-atz)*ts);
+    _pos.current.set(
+      ax + (bx - ax) * ts,
+      ay + (by - ay) * ts,
+      az + (bz - az) * ts,
+    );
+    _target.current.set(
+      atx + (btx - atx) * ts,
+      aty + (bty - aty) * ts,
+      atz + (btz - atz) * ts,
+    );
 
     if (isMobile) {
       // Push camera further back so models appear smaller / more distant
@@ -193,7 +355,7 @@ function CameraRig({ progressRef, debugRef, isMobile }: { progressRef: React.Ref
     camera.lookAt(_target.current);
 
     if (debugRef.current) {
-      debugRef.current.textContent = `Waypoint ${i} → ${i+1}  |  ${WAYPOINT_NAMES[i]} → ${WAYPOINT_NAMES[i+1]}  |  t=${t.toFixed(2)}`;
+      debugRef.current.textContent = `Waypoint ${i} → ${i + 1}  |  ${WAYPOINT_NAMES[i]} → ${WAYPOINT_NAMES[i + 1]}  |  t=${t.toFixed(2)}`;
     }
   });
 
@@ -475,7 +637,7 @@ function SceneContent({ isMobile }: { isMobile?: boolean }) {
           step: R,
           label: "Rot Y",
         },
-        p7s: { value: 1.70, min: 0.05, max: 5, step: 0.05, label: "Scale ×" },
+        p7s: { value: 1.7, min: 0.05, max: 5, step: 0.05, label: "Scale ×" },
       },
       { collapsed: true },
     ),
@@ -496,7 +658,6 @@ function SceneContent({ isMobile }: { isMobile?: boolean }) {
       { collapsed: true },
     ),
   });
-
 
   // ── Live place configs from Leva ──────────────────────────────────────
 
@@ -621,27 +782,63 @@ export default function TownScene({
 
   // Tracks which waypoint segment the camera is in (0 = WP0→1, 1 = WP1→2, …)
   const [waypointIndex, setWaypointIndex] = useState(0);
-  const handleSegmentChange = useCallback((i: number) => setWaypointIndex(i), []);
+  const handleSegmentChange = useCallback(
+    (i: number) => setWaypointIndex(i),
+    [],
+  );
 
   // Per-place content style controls
   const cp = useControls("Content Positions", {
     ...Object.fromEntries(
       PLACES.flatMap((p) => [
-        [`p${p.id}x`,  { value: p.cx,       min: 0,   max: 95,   step: 1,    label: `P${p.id} X %`       }],
-        [`p${p.id}y`,  { value: p.cy,       min: 0,   max: 95,   step: 1,    label: `P${p.id} Y %`       }],
-        [`p${p.id}w`,  { value: p.maxW,     min: 100, max: 1200, step: 10,   label: `P${p.id} MaxW px`   }],
-        [`p${p.id}fs`,  { value: p.fontSize,     min: 0.5, max: 6,    step: 0.05, label: `P${p.id} Title rem` }],
-        [`p${p.id}dfs`, { value: p.descFontSize, min: 0.5, max: 4,    step: 0.05, label: `P${p.id} Desc rem`  }],
-      ])
+        [
+          `p${p.id}x`,
+          { value: p.cx, min: 0, max: 95, step: 1, label: `P${p.id} X %` },
+        ],
+        [
+          `p${p.id}y`,
+          { value: p.cy, min: 0, max: 95, step: 1, label: `P${p.id} Y %` },
+        ],
+        [
+          `p${p.id}w`,
+          {
+            value: p.maxW,
+            min: 100,
+            max: 1200,
+            step: 10,
+            label: `P${p.id} MaxW px`,
+          },
+        ],
+        [
+          `p${p.id}fs`,
+          {
+            value: p.fontSize,
+            min: 0.5,
+            max: 6,
+            step: 0.05,
+            label: `P${p.id} Title rem`,
+          },
+        ],
+        [
+          `p${p.id}dfs`,
+          {
+            value: p.descFontSize,
+            min: 0.5,
+            max: 4,
+            step: 0.05,
+            label: `P${p.id} Desc rem`,
+          },
+        ],
+      ]),
     ),
   }) as Record<string, number>;
 
   // Pick content by waypoint segment; hide only during t < 0.3 (handled by WaypointSync)
   const place = waypointIndex >= 0 ? PLACES[waypointIndex] : null;
-  const cx = place ? cp[`p${place.id}x`]  : 5;
-  const cy = place ? cp[`p${place.id}y`]  : 60;
-  const cw = place ? cp[`p${place.id}w`]  : 420;
-  const fs  = place ? cp[`p${place.id}fs`]  : 2.25;
+  const cx = place ? cp[`p${place.id}x`] : 5;
+  const cy = place ? cp[`p${place.id}y`] : 60;
+  const cw = place ? cp[`p${place.id}w`] : 420;
+  const fs = place ? cp[`p${place.id}fs`] : 2.25;
   const dfs = place ? cp[`p${place.id}dfs`] : 1.125;
 
   return (
@@ -661,8 +858,15 @@ export default function TownScene({
         }}
       >
         <MobileFOV isMobile={isMobile} />
-        <CameraRig progressRef={progressRef} debugRef={debugRef} isMobile={isMobile} />
-        <WaypointSync progressRef={progressRef} onSegmentChange={handleSegmentChange} />
+        <CameraRig
+          progressRef={progressRef}
+          debugRef={debugRef}
+          isMobile={isMobile}
+        />
+        <WaypointSync
+          progressRef={progressRef}
+          onSegmentChange={handleSegmentChange}
+        />
         <Suspense fallback={null}>
           <SceneContent isMobile={isMobile} />
         </Suspense>
@@ -678,33 +882,53 @@ export default function TownScene({
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.35, ease: [0.25, 0.1, 0, 1] }}
             className="absolute z-30 pointer-events-none select-none"
-            style={isMobile ? {
-              left: "0",
-              right: "0",
-              top: "4%",
-              maxWidth: "100%",
-              padding: "0 6%",
-              textAlign: place.id === 8 ? "center" : "left",
-            } : {
-              left: `${cx}%`,
-              top: `${cy}%`,
-              maxWidth: cw,
-            }}
+            style={
+              isMobile
+                ? {
+                    left: "0",
+                    right: "0",
+                    top: "4%",
+                    maxWidth: "100%",
+                    padding: "0 6%",
+                    textAlign: place.id === 8 ? "center" : "left",
+                  }
+                : {
+                    left: `${cx}%`,
+                    top: `${cy}%`,
+                    maxWidth: cw,
+                  }
+            }
           >
             <h2
               className="text-[#1C2632] font-light leading-[1.1] mb-1.5 drop-shadow-lg"
-              style={{ fontSize: isMobile ? (place.id === 8 ? "clamp(2.25rem,10vw,3.5rem)" : `${Math.min(fs, 1.25)}rem`) : `${fs}rem` }}
+              style={{
+                fontSize: isMobile
+                  ? place.id === 8
+                    ? "clamp(2.25rem,10vw,3.5rem)"
+                    : `${Math.min(fs, 1.25)}rem`
+                  : `${fs}rem`,
+              }}
             >
               {place.nameHighlight
-                ? place.name.split(place.nameHighlight).flatMap((part, i, arr) =>
-                    i < arr.length - 1
-                      ? [part, <span key={i} className="text-[#ff6b00]">{place.nameHighlight}</span>]
-                      : [part]
-                  )
+                ? place.name
+                    .split(place.nameHighlight)
+                    .flatMap((part, i, arr) =>
+                      i < arr.length - 1
+                        ? [
+                            part,
+                            <span key={i} className="text-[#ff6b00]">
+                              {place.nameHighlight}
+                            </span>,
+                          ]
+                        : [part],
+                    )
                 : place.name}
             </h2>
             {place.subText && (
-              <p className="font-ki text-[#ff6b00] mb-1" style={{ fontSize: isMobile ? "0.7rem" : undefined }}>
+              <p
+                className="font-ki text-[#ff6b00] mb-1"
+                style={{ fontSize: isMobile ? "0.7rem" : undefined }}
+              >
                 {place.subText}
               </p>
             )}
@@ -717,7 +941,6 @@ export default function TownScene({
           </motion.div>
         )}
       </AnimatePresence>
-
     </div>
   );
 }
