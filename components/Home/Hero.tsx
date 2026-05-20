@@ -1,6 +1,7 @@
 "use client";
 
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, Component } from "react";
+import type { ReactNode } from "react";
 import dynamic from "next/dynamic";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -14,6 +15,13 @@ import DotIcon from "../Reusable/Icons/DotIcon";
 import { useAudioAnalyser } from "@/lib/useAudioAnalyser";
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
+
+// Catch WebGL / Three.js crashes so the rest of the page survives
+class SceneErrorBoundary extends Component<{ children: ReactNode }, { dead: boolean }> {
+  state = { dead: false };
+  static getDerivedStateFromError() { return { dead: true }; }
+  render() { return this.state.dead ? <div className="w-full h-full" /> : this.props.children; }
+}
 
 // Avoid SSR crash — Canvas needs browser WebGL
 const TownScene = dynamic(() => import("./TownScene"), {
@@ -98,10 +106,10 @@ const Hero = () => {
         scrollTrigger: {
           trigger: triggerEl,
           start: "top 9%",
-          end: "+=1200%",
+          end: "+=2400%",
           pin: true,
           pinSpacing: true,
-          scrub: 0.5,
+          scrub: 2,
           onUpdate: (st) => {
             // Clamp at 0.92 (raw ≈ 7.36 in 8-waypoint space, t > 0.3 in last
             // segment so content 8 shows) — prevents camera flying to the
@@ -177,9 +185,13 @@ const Hero = () => {
     {/* ── Mobile layout ── */}
     <div ref={mobileContainerRef} className="md:hidden mt-[9dvh] h-[91dvh] relative overflow-hidden">
 
-      {/* Canvas — full-screen, no z-index so overlay's z-30 wins in document context */}
+      {/* Canvas — only mount after we know this is mobile, prevents double WebGL context */}
       <div className="absolute inset-0">
-        <TownScene progressRef={progressRef} activePlaceIndex={activePlace} isMobile />
+        {mounted && isMobile && (
+          <SceneErrorBoundary>
+            <TownScene progressRef={progressRef} activePlaceIndex={activePlace} isMobile />
+          </SceneErrorBoundary>
+        )}
       </div>
 
       {/* Content panel — pinned to top, auto height, 3-D visible below */}
@@ -288,14 +300,18 @@ const Hero = () => {
         </ContainerLayout>
       </div>
 
-      {/* ── 3-D Canvas ── */}
+      {/* ── 3-D Canvas — only mount after we know this is desktop, prevents double WebGL context ── */}
       <div
         ref={canvasWrapperRef}
         className="absolute inset-0 z-10"
         style={{ clipPath: "inset(0% 0% 0% 50%)" }}
       >
         <div className="absolute inset-0 border border-gray pointer-events-none z-10" />
-        <TownScene progressRef={progressRef} activePlaceIndex={activePlace} />
+        {mounted && !isMobile && (
+          <SceneErrorBoundary>
+            <TownScene progressRef={progressRef} activePlaceIndex={activePlace} />
+          </SceneErrorBoundary>
+        )}
       </div>
     </div>
     </>

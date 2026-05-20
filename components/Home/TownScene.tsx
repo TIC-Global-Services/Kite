@@ -172,8 +172,11 @@ function CameraRig({ progressRef, debugRef, isMobile }: { progressRef: React.Ref
     const atx = wp[`w${ai}tx`], aty = wp[`w${ai}ty`], atz = wp[`w${ai}tz`];
     const btx = wp[`w${bi}tx`], bty = wp[`w${bi}ty`], btz = wp[`w${bi}tz`];
 
-    _pos.current.set(ax + (bx-ax)*t, ay + (by-ay)*t, az + (bz-az)*t);
-    _target.current.set(atx + (btx-atx)*t, aty + (bty-aty)*t, atz + (btz-atz)*t);
+    // Smoothstep eases the camera in/out at each waypoint instead of linear fly-through
+    const ts = THREE.MathUtils.smoothstep(t, 0, 1);
+
+    _pos.current.set(ax + (bx-ax)*ts, ay + (by-ay)*ts, az + (bz-az)*ts);
+    _target.current.set(atx + (btx-atx)*ts, aty + (bty-aty)*ts, atz + (btz-atz)*ts);
 
     if (isMobile) {
       // Push camera further back so models appear smaller / more distant
