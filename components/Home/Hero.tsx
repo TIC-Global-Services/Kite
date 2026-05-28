@@ -6,13 +6,13 @@ import dynamic from "next/dynamic";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
-import { motion, AnimatePresence } from "framer-motion";
 import { useProgress } from "@react-three/drei";
 import ContainerLayout from "../Layout/ContainerLayout";
 import PlayingWaves from "../Reusable/PlayingWaves";
 import PrimaryButton from "../Reusable/PrimaryButton";
 import DotIcon from "../Reusable/Icons/DotIcon";
 import { useAudioAnalyser } from "@/lib/useAudioAnalyser";
+import PageLoader from "../Reusable/PageLoader";
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
@@ -157,30 +157,7 @@ const Hero = () => {
   return (
     <>
     {/* ── Full-page loader ── */}
-    <AnimatePresence>
-      {!sceneLoaded && (
-        <motion.div
-          className="fixed inset-0 z-[200] bg-background flex flex-col items-center justify-center"
-          initial={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.9, ease: [0.25, 0.1, 0, 1] }}
-        >
-          <div className="flex flex-col items-center gap-10">
-            <h1 className="text-5xl font-ki tracking-tight text-primary">Kite</h1>
-            <div className="w-56 h-[1px] bg-gray relative overflow-hidden">
-              <motion.div
-                className="absolute inset-y-0 left-0 bg-primary"
-                animate={{ width: `${progress}%` }}
-                transition={{ ease: "linear", duration: 0.2 }}
-              />
-            </div>
-            <p className="text-[11px] font-mono tracking-[0.3em] text-primary/40 uppercase">
-              {Math.round(progress)} %
-            </p>
-          </div>
-        </motion.div>
-      )}
-    </AnimatePresence>
+    <PageLoader progress={progress} visible={!sceneLoaded} />
 
     {/* ── Mobile layout ── */}
     <div ref={mobileContainerRef} className="md:hidden mt-[9dvh] h-[91dvh] relative overflow-hidden">
@@ -194,20 +171,11 @@ const Hero = () => {
         )}
       </div>
 
-      {/* Content panel — pinned to top, auto height, 3-D visible below */}
-      <div ref={mobileContentRef} className="absolute top-0 left-0 right-0 flex flex-col">
-        {/* Waves */}
-        <div className="relative bg-[#E3DFD4] overflow-hidden border-b border-gray" style={{ height: "20dvh" }}>
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <div className="h-full w-full px-4 [mask-image:radial-gradient(circle,black_50%,transparent_90%)]">
-              <PlayingWaves barCount={60} analyser={analyser} />
-            </div>
-          </div>
-        </div>
-
+      {/* Content panel — full height, transparent middle lets 3-D show through */}
+      <div ref={mobileContentRef} className="absolute inset-0 flex flex-col">
         {/* Title + description */}
-        <div className="px-6 py-4 space-y-2 border-b border-gray bg-background">
-          <h1 className="text-[clamp(1.5rem,6vw,2.25rem)] leading-[1.1]">
+        <div className="px-6 py-4 space-y-2 md:border-b border-gray bg-background shrink-0">
+          <h1 className="text-[clamp(1.5rem,7vw,2.25rem)] leading-[1.1]">
             Make AI see, think,
             <br />
             reason, and execute
@@ -216,6 +184,18 @@ const Hero = () => {
             Explore live AI experiences that gather signals from the
             web, organize what matters, and execute tasks autonomously
           </p>
+        </div>
+
+        {/* 3D shows through here */}
+        <div className="flex-1" />
+
+        {/* Waves */}
+        <div className="relative bg-[#E3DFD4] overflow-hidden border-t border-gray shrink-0" style={{ height: "20dvh" }}>
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <div className="h-full w-full px-4 [mask-image:radial-gradient(circle,black_50%,transparent_90%)]">
+              <PlayingWaves barCount={60} analyser={analyser} />
+            </div>
+          </div>
         </div>
 
         {/* Buttons */}

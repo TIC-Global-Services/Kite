@@ -82,7 +82,7 @@ export default function WhyKite() {
   return (
     <section className="w-full">
       <ContainerLayout disablePaddingY >
-        <div className="grid grid-cols-1 md:grid-cols-2 border-x border-b py-10 md:py-20 border-gray">
+        <div className="grid grid-cols-1 md:grid-cols-2 border-x md:border-b py-10 md:py-20 border-gray">
 
           {/* ── Left col ── */}
           <div className="flex flex-col border-b  md:border-r border-y border-gray">

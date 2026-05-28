@@ -102,7 +102,7 @@ export default function Process() {
 
   return (
     <section ref={sectionRef} className="w-full ">
-      <ContainerLayout disablePaddingY>
+      <ContainerLayout disablePaddingY className="border-t border-gray md:border-t-0">
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
@@ -110,8 +110,8 @@ export default function Process() {
           className="border-x border-gray"
         >
           {/* ── Top spacer row ──────────────────────────────────────────── */}
-          <div className="hidden md:grid grid-cols-2 border-b border-gray h-20">
-            <div className="border-r border-gray" />
+          <div className="grid grid-cols-1 md:grid-cols-2 border-b border-gray h-14 md:h-20">
+            <div className="md:border-r border-gray" />
             <div />
           </div>
 
@@ -270,8 +270,8 @@ export default function Process() {
           </div>
 
           {/* ── Bottom spacer row ───────────────────────────────────────── */}
-          <div className="hidden md:grid grid-cols-2 h-20">
-            <div className="border-r border-gray" />
+          <div className="grid grid-cols-1 md:grid-cols-2 h-14 md:h-20">
+            <div className=" md:border-r border-gray" />
             <div />
           </div>
         </motion.div>

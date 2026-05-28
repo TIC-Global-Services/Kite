@@ -341,14 +341,15 @@ function CameraRig({
     );
 
     if (isMobile) {
-      // Push camera further back so models appear smaller / more distant
+      // Push camera slightly further back so models appear at a comfortable size
       _dir.current.subVectors(_pos.current, _target.current).normalize();
-      _pos.current.addScaledVector(_dir.current, 6);
+      _pos.current.addScaledVector(_dir.current, 4);
 
-      // At progress=0 tilt camera upward (raise target Y) so the town sits at
-      // the bottom of the canvas frame. Fade the offset to 0 by progress=0.15.
+      // At p=0 tilt camera downward and pan left so models appear higher and
+      // shifted right in the viewport. Fades out by p=0.15.
       const tiltFade = 1 - THREE.MathUtils.clamp(p / 0.15, 0, 1);
-      _target.current.y += 14 * tiltFade;
+      _target.current.y -= 8 * tiltFade;
+      _target.current.x += 5 * tiltFade;
     }
 
     camera.position.copy(_pos.current);

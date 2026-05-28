@@ -50,11 +50,11 @@ function FormField({
   onChange: (v: string) => void;
 }) {
   const base =
-    "w-full bg-transparent text-foreground/70 placeholder:text-foreground/40 font-ki text-lg outline-none resize-none border-b border-gray pb-2 pr-8 transition-colors focus:border-primary";
+    "w-full bg-transparent text-foreground/70 placeholder:text-foreground/40 font-ki md:text-lg outline-none resize-none border-b border-gray pb-2 pr-8 transition-colors focus:border-primary";
 
   return (
     <div className="space-y-2">
-      <label className="block text-lg text-foreground tracking-tight">
+      <label className="block md:text-lg text-foreground tracking-tight">
         {label}
       </label>
       <div className="relative">
@@ -131,11 +131,11 @@ export default function ContactForm() {
         <div className="grid grid-cols-1 md:grid-cols-2">
 
           {/* ── Left: header + form ── */}
-          <div className="flex flex-col border-b md:border-b-0 border-x border-gray py-20">
+          <div className="flex flex-col border-b md:border-b-0 border-x border-gray pt-14 md:py-20">
 
             {/* Dark header */}
             <div className="bg-primary text-background p-6 md:p-10 space-y-3 border-b border-gray">
-              <h2 className="text-5xl text-background">Let's Talk</h2>
+              <h2 className=" text-4xl md:text-5xl text-background">Let's Talk</h2>
               <p className="font-ki text-background">
                 Share a few details and we'll take it from there.
               </p>
@@ -183,7 +183,7 @@ export default function ContactForm() {
 
           {/* ── Right: wave + privacy + button ── */}
           {/* Mobile: reversed → button first, desc, wave last. Desktop: wave, desc, button */}
-          <div className="flex flex-col-reverse md:flex-col border-x  border-r border-gray py-20 ">
+          <div className="flex flex-col-reverse md:flex-col border-x  border-r border-gray pb-14 md:py-20 ">
 
             {/* GIF visual */}
             <div className="hidden md:block flex-1 relative overflow-hidden min-h-[280px] border-b border-t border-gray">
@@ -197,8 +197,8 @@ export default function ContactForm() {
             </div>
 
             {/* Privacy + submit — internally reversed on mobile: button first */}
-            <div className=" p-6 md:p-10 flex flex-col-reverse md:flex-col items-start gap-6 border-b border-gray">
-              <p className="font-ki text-foreground max-w-2xl">
+            <div className=" p-6 md:p-10 flex flex-col md:flex-col items-start gap-6 border-b border-gray">
+              <p className="font-ki text-foreground max-w-2xl text-sm md:text-base">
                 We are committed to protecting your privacy. We will never
                 collect information about you without your explicit consent.
               </p>
