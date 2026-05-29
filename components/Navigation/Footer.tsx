@@ -121,7 +121,7 @@ const Footer = () => {
         </div>
 
         {/* ── Copyright bar ── */}
-        <div className="flex flex-col md:flex-row items-center justify-between gap-2 px-6 md:px-10 py-5 font-ki border-t text-xs md:text-sm text-background/40 border-x border-gray">
+        <div className="flex flex-col md:flex-row items-center text-center md:text-left justify-between gap-2 px-6 md:px-10 py-5 font-ki border-t text-xs md:text-sm text-background/40 border-x border-gray">
           <span>
             © {new Date().getFullYear()}{" "}
             <span className="text-[#ff6b00]">Kite AI</span>. All Rights Reserved.
