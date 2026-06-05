@@ -145,8 +145,8 @@ export const PLACES: PlaceConfig[] = [
     nameHighlight: "Kite AI",
     cx: 3,
     cy: 5,
-    maxW: 520,
-    fontSize: 5.25,
+    maxW: 820,
+    fontSize: 8.25,
     descFontSize: 1.125,
   },
 ];
@@ -815,7 +815,7 @@ export default function TownScene({
           {
             value: p.fontSize,
             min: 0.5,
-            max: 6,
+            max: 15,
             step: 0.05,
             label: `P${p.id} Title rem`,
           },
@@ -842,36 +842,43 @@ export default function TownScene({
   const fs = place ? cp[`p${place.id}fs`] : 2.25;
   const dfs = place ? cp[`p${place.id}dfs`] : 1.125;
 
+  const isLastScene = place?.id === 8;
+
   return (
     <div className="w-full h-full relative">
-      <Canvas
-        className="w-full h-full"
-        camera={{ position: [-56, 7, 47], fov: 55, near: 0.1, far: 600 }}
-        dpr={[1, 2]}
-        // Auto-lower DPR when FPS drops; iOS GPU is the main constraint
-        performance={{ min: 0.5 }}
-        gl={{
-          alpha: true,
-          antialias: true,
-          powerPreference: isMobile ? "default" : "high-performance",
-          // stencil buffer is never used here; disabling it saves ~25% framebuffer memory on iOS
-          stencil: false,
-        }}
+      <div
+        className="w-full h-full transition-opacity duration-700"
+        style={{ opacity: isLastScene ? 0 : 1 }}
       >
-        <MobileFOV isMobile={isMobile} />
-        <CameraRig
-          progressRef={progressRef}
-          debugRef={debugRef}
-          isMobile={isMobile}
-        />
-        <WaypointSync
-          progressRef={progressRef}
-          onSegmentChange={handleSegmentChange}
-        />
-        <Suspense fallback={null}>
-          <SceneContent isMobile={isMobile} />
-        </Suspense>
-      </Canvas>
+        <Canvas
+          className="w-full h-full"
+          camera={{ position: [-56, 7, 47], fov: 55, near: 0.1, far: 600 }}
+          dpr={[1, 2]}
+          // Auto-lower DPR when FPS drops; iOS GPU is the main constraint
+          performance={{ min: 0.5 }}
+          gl={{
+            alpha: true,
+            antialias: true,
+            powerPreference: isMobile ? "default" : "high-performance",
+            // stencil buffer is never used here; disabling it saves ~25% framebuffer memory on iOS
+            stencil: false,
+          }}
+        >
+          <MobileFOV isMobile={isMobile} />
+          <CameraRig
+            progressRef={progressRef}
+            debugRef={debugRef}
+            isMobile={isMobile}
+          />
+          <WaypointSync
+            progressRef={progressRef}
+            onSegmentChange={handleSegmentChange}
+          />
+          <Suspense fallback={null}>
+            <SceneContent isMobile={isMobile} />
+          </Suspense>
+        </Canvas>
+      </div>
 
       {/* ── Content overlay ── */}
       <AnimatePresence>
@@ -884,14 +891,24 @@ export default function TownScene({
             transition={{ duration: 0.35, ease: [0.25, 0.1, 0, 1] }}
             className="absolute z-30 pointer-events-none select-none"
             style={
-              isMobile
+              isLastScene
+                ? {
+                    inset: 0,
+                    margin: "auto",
+                    width: "fit-content",
+                    height: "fit-content",
+                    textAlign: "center",
+                    maxWidth: cw,
+                    padding: isMobile ? "0 6%" : undefined,
+                  }
+                : isMobile
                 ? {
                     left: "0",
                     right: "0",
                     top: "4%",
                     maxWidth: "100%",
                     padding: "0 6%",
-                    textAlign: place.id === 8 ? "center" : "left",
+                    textAlign: "left",
                   }
                 : {
                     left: `${cx}%`,
@@ -917,6 +934,7 @@ export default function TownScene({
                       i < arr.length - 1
                         ? [
                             part,
+                            <br key={`br-${i}`} />,
                             <span key={i} className="text-[#ff6b00]">
                               {place.nameHighlight}
                             </span>,
